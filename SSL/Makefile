@@ -1,6 +1,4 @@
-#gcc -o ssl pruebassl.c -lssl -lcrypto
-
-all: certificados
+all: certificados ssl
 
 certificados:
 	openssl genrsa -out cakey.pem 2048
@@ -19,3 +17,9 @@ certificados:
 	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in servidorcert.pem -out servidorcert.pem 
 	cat servidorcert.pem servidorkey.pem > certs/servidor.pem
 	rm servidorkey.pem servidorcert.pem
+
+ssl:
+	gcc -o ssl pruebassl.c -lssl -lcrypto
+
+clean: 
+	rm -f ssl *.o certs/*.*

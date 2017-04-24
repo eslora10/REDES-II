@@ -70,10 +70,28 @@ int cargar_certificados(SSL_CTX* ctx, char* CertFile, char* CertPath){
     }
 }
 
+int inicializar_nivel_ssl();
+/**
+ * @brief Inicializa el contexto que será utilizado para la creación de canales seguros mediante SSL
+ * @param cert_file nombre del certificado de la CA
+ * @param cert_path ruta del certificado de la CA
+ * @return contexto creado
+ * @return NULL en caso de error
+*/
+SSL_CTX* fijar_contexto_SSL(char* cert_file, char* cert_path){
+    SSL_CTX *ctx;
+    ctx = nuevo_contexto_ssl();
+    if(!ctx)
+        return NULL;
+    if(cargar_certificados(ctx, cert_file, cert_path) < 0)
+        return NULL;
+
+    return ctx;
+}
+
 int main(){
 	SSL_CTX* ctx;
-	ctx = nuevo_contexto_ssl();
-	cargar_certificados(ctx, "root.pem", "/home/alumnos/e321098/Desktop/root.pem");
+	ctx = fijar_contexto_SSL("certs/ca.pem", "certs/ca.pem");
 
 	return 0;
 }
