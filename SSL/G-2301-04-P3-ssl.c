@@ -65,6 +65,7 @@ int cargar_certificados(SSL_CTX* ctx, char* CertFile, char* CertPath){
         fprintf(stderr, "La clave privada no coincide con la del certificado publico\n");
         return -1;
     }
+    return 0;
 }
 
 
@@ -86,15 +87,7 @@ SSL_CTX* fijar_contexto_SSL(char* cert_file, char* cert_path){
     return ctx;
 }
 
-/**
- * @brief Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando 
- * el proceso de handshake con el otro extremo
- * @param ctx contexto de la aplicacion
- * @param sck descriptor del socket
- * @return puntero a una estructura ssl con la conexion creada
- * @return NULL en caso de error
-*/
-SSL* conectar_canal_seguro_SSL(SSL_CTX* ctx, int sck){
+SSL* nueva_conexion_ssl(SSL_CTX* ctx, int sck){
     SSL* ssl;
     
     /*Creamos la estructura ssl con el canal seguro*/
@@ -109,22 +102,55 @@ SSL* conectar_canal_seguro_SSL(SSL_CTX* ctx, int sck){
         ERR_print_errors_fp(stderr);
         return NULL;
     }
-    
+
     return ssl;
 }
 
 /**
- * @brief DDado un contexto SSL y un descriptor de socket esta función se queda
+ * @brief Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando 
+ * el proceso de handshake con el otro extremo
+ * @param ctx contexto de la aplicacion
+ * @param sck descriptor del socket
+ * @return puntero a una estructura ssl con la conexion creada
+ * @return NULL en caso de error
+*/
+SSL* conectar_canal_seguro_SSL(SSL_CTX* ctx, int sck){
+    SSL* ssl;
+    
+    ssl = nueva_conexion_ssl(ctx, sck);
+    if(!ssl)
+        return NULL;
+
+    /*Esperamos el handshake por parte del cliente*/
+    if(SSL_connect(ssl) <= 0){
+        ERR_print_errors_fp(stderr);
+        return NULL;
+    }
+
+    return ssl;
+}
+
+/**
+ * @brief Dado un contexto SSL y un descriptor de socket esta función se queda
  * esperando hasta recibir un handshake por parte del cliente.
  * @param ssl puntero a la estructura de conexión ssl
  * @return 0 correcto
  * @return -1 error
 */
-int aceptar_canal_seguro_SSL(SSL* ssl){
+SSL* aceptar_canal_seguro_SSL(SSL_CTX* ctx, int sck){
+    SSL* ssl;
+    
+    ssl = nueva_conexion_ssl(ctx, sck);
+    if(!ssl)
+        return NULL;
+
+    /*Esperamos el handshake por parte del cliente*/
     if(SSL_accept(ssl) <= 0){
         ERR_print_errors_fp(stderr);
         return NULL;
     }
+    
+    return ssl;
 }
 
 

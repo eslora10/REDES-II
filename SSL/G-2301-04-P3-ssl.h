@@ -28,13 +28,14 @@ SSL_CTX* fijar_contexto_SSL(char* cert_file, char* cert_path);
 SSL* conectar_canal_seguro_SSL(SSL_CTX* ctx, int sck);
 
 /**
- * @brief DDado un contexto SSL y un descriptor de socket esta función se queda
+ * @brief Dado un contexto SSL y un descriptor de socket esta función se queda
  * esperando hasta recibir un handshake por parte del cliente.
- * @param ssl puntero a la estructura de conexión ssl
- * @return 0 correcto
- * @return -1 error
+ * @param ctx contexto de la aplicacion
+ * @param sck descriptor del socket
+ * @return puntero a una estructura ssl con la conexion creada
+ * @return NULL en caso de error
 */
-int aceptar_canal_seguro_SSL(SSL* ssl);
+SSL* aceptar_canal_seguro_SSL(SSL_CTX* ctx, int sck);
 
 
 #endif /*SSL_H*/

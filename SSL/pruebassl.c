@@ -22,12 +22,11 @@ int main(){
         return -1;
     }
     
-    ssl = conectar_canal_seguro_SSL(ctx, cl_sck);
+    ssl = aceptar_canal_seguro_SSL(ctx, cl_sck);
     if(!ssl){
         perror("Error en el handshake inicial");
         return -1;
-    }
-    
+    }  
     
 
     
