@@ -2,13 +2,13 @@
 #define SOCKET_H
 
 /**
-* Modulo de sockets. Contiene funciones de alto nivel para el manejo de
-* sockets así como la función que manejan los hilos.
-* @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
-* @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
-* @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
-* @file G-2301-04-P1-socket.h
-*/
+ * Modulo de sockets. Contiene funciones de alto nivel para el manejo de
+ * sockets así como la función que manejan los hilos.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P1-socket.h
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,26 +37,32 @@
  */
 #define MAXLEN 512 
 
+typedef enum {
+    TCP, UDP
+} protocol;
+
 /**
-* @brief Daemoniza el proceso
-*/
+ * @brief Daemoniza el proceso
+ */
 void daemonizar();
 
 /**
-* @brief Abre un socket para comunicarse con el servidor
-* @return devuelve el descriptor de fichero del socket, 
-		  -1 en caso de error
-*/
-int openSocket();
+ * @brief Abre un socket para comunicarse con el servidor
+ * @param protocol UDP en caso de querer conexion no fiable
+ * TCP conexion segura (valor por defecto)
+ * @return devuelve el descriptor de fichero del socket,
+                  -1 en caso de error
+ */
+int openSocket(protocol p);
 
 /**
-* @brief Dado un socket notifica al SO de la apertura del mismo
-* @param sck descriptor del socket
-* @param port puerto con el protocolo de nivel de aplicacion
-* @param max_clients numero maximo de clientes esperando a ser atendidos
-* @return 0 si se realiza todo correctamente, 	
-		  -1 en caso de error
-*/
+ * @brief Dado un socket notifica al SO de la apertura del mismo
+ * @param sck descriptor del socket
+ * @param port puerto con el protocolo de nivel de aplicacion
+ * @param max_clients numero maximo de clientes esperando a ser atendidos
+ * @return 0 si se realiza todo correctamente, 	
+                  -1 en caso de error
+ */
 int bindSocket(int sck, uint16_t port, int max_clients);
 
 /**
@@ -67,19 +73,19 @@ int bindSocket(int sck, uint16_t port, int max_clients);
 int acceptSocket(int sck);
 
 /**
-* @brief Dado un socket acepta la peticion de un cliente
-* @param sck descriptor del socket
-*/
+ * @brief Dado un socket acepta la peticion de un cliente
+ * @param sck descriptor del socket
+ */
 void * attendClientSocket(void *sck);
 
 /**
-* @brief Dado un socket, conecta con una IP y un puerto especifico.
-* Específica para clientes.
-* @param sck identificador de fichero con el socket
-* @param host_name url o direccion IP del servidor
-* @param port numero de puerto
-* @return 0 si todo ha ido bien, -1 en caso de error
-*/
+ * @brief Dado un socket, conecta con una IP y un puerto especifico.
+ * Específica para clientes.
+ * @param sck identificador de fichero con el socket
+ * @param host_name url o direccion IP del servidor
+ * @param port numero de puerto
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
 int connectClientSocket(int sck, char* host_name, int port);
 
 #endif /*SOCKET_H*/

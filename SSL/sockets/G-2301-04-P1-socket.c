@@ -1,31 +1,18 @@
 /**
-* Modulo de sockets. Contiene funciones de alto nivel para el manejo de
-* sockets así como la función que manejan los hilos y la que daemoniza.
-* @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
-* @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
-* @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
-* @file G-2301-04-P1-socket.h
-*/
+ * Modulo de sockets. Contiene funciones de alto nivel para el manejo de
+ * sockets así como la función que manejan los hilos y la que daemoniza.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P1-socket.h
+ */
 
 #include "G-2301-04-P1-socket.h"
-#include "G-2301-04-P1-command.h"
 
-/*funcion interna*/
 /**
- * @brief Inicia la conexion con el cliente. Espera los comandos
- * NICK, USER en este orden, si no se cierra la conexion con el cliente
- * @param cl_sck identificador de fichero con el socket
- * @param pBuffer buffer para la recepcion de mensajes
- * @param nick cadena de caracteres en la que se guardara el nick del
- * nuevo usuario
- * @return 0 si todo ha ido bien, -1 en caso de error
+ * @brief Transforma al proceso que la llama en daemon y abre el log del sistema,
+ * dicho fichero debe ser cerrado posteriormente
  */
-int beginConnection(int cl_sck, char **pBuffer, char **nick);
-
-/**
-* @brief Transforma al proceso que la llama en daemon y abre el log del sistema,
-* dicho fichero debe ser cerrado posteriormente
-*/
 void daemonizar() {
 
     pid_t pid;
@@ -65,16 +52,27 @@ void daemonizar() {
 
 /**
  * @brief Abre un socket para comunicarse con el servidor
+ * @param protocol UDP en caso de querer conexion no fiable
+ * TCP conexion segura (valor por defecto)
  * @return devuelve el descriptor de fichero del socket,
                   -1 en caso de error
  */
-int openSocket() {
+int openSocket(protocol p) {
     int sck;
 
     /*Abrimos el socket, STREAM significa que usaremos el protocolo TCP*/
-    sck = socket(AF_INET, SOCK_STREAM, 0);
-    if (sck < 0)
-        return -1;
+    switch (p) {
+        case UDP:
+            sck = socket(AF_INET, SOCK_DGRAM, 0);
+            if (sck < 0)
+                return -1;
+            break;
+        default:
+            sck = socket(AF_INET, SOCK_STREAM, 0);
+            if (sck < 0)
+                return -1;
+            break;
+    }
     return sck;
 }
 
@@ -128,60 +126,6 @@ int acceptSocket(int sck) {
 }
 
 /**
- * @brief Dado un socket acepta la peticion de un cliente
- * @param sck descriptor del socket
- */
-void* attendClientSocket(void *sck) {
-    int ret = 0, cl_sck;
-    long fun = 0;
-    char *buffer = NULL;
-    char * pBuffer, *command = NULL;
-    char  *nick = NULL;
-
-    cl_sck = *((int*)sck);
-
-    beginConnection(cl_sck, &buffer, &nick);
-
-    if (!buffer) {
-        buffer = (char*) malloc(MAXLEN * sizeof (char));
-    }
-
-    do {
-        bzero(buffer, MAXLEN);
-        if (recv(cl_sck, buffer, MAXLEN, 0) <= 0) {
-            /*Se ha producido un error o el cliente ha cerrado la conexion*/
-            IRCTAD_Quit (nick);
-            free(nick);
-            free(buffer);
-            close(cl_sck);
-            pthread_exit(NULL);
-        }
-        pBuffer = buffer;
-
-        do {
-            pBuffer = IRC_UnPipelineCommands(pBuffer, &command);
-
-            fun = IRC_CommandQuery(command);
-            if (fun < 0) {
-                FuncDefault(command, nick, cl_sck);
-            } else {
-                ret = Commands[fun](command, nick, cl_sck);
-            }
-            /*Actualizamos el timestamp de la ultima accion del usuario*/
-            IRCTADUser_SetActionTS (0, NULL, nick, NULL);
-            free(command);
-
-        } while (pBuffer);
-    } while (ret != END_CONNECTION);
-
-    free(buffer);
-    free(nick);
-    close(cl_sck);
-
-    pthread_exit(NULL);
-}
-
-/**
  * @brief Dado un socket, conecta con una IP y un puerto especifico.
  * Específica para clientes.
  * @param sck identificador de fichero con el socket
@@ -208,115 +152,6 @@ int connectClientSocket(int sck, char* host_name, int port) {
     if (connect(sck, (struct sockaddr *) &addr, sizeof (addr)))
         return -1;
 
-    return 0;
-
-}
-
-/**
- * @brief Inicia la conexion con el cliente. Espera los comandos
- * NICK, USER en este orden, si no se cierra la conexion con el cliente
- * @param cl_sck identificador de fichero con el socket
- * @param pBuffer buffer para la recepcion de mensajes
- * @param nick cadena de caracteres en la que se guardara el nick del
- * nuevo usuario
- * @return 0 si todo ha ido bien, -1 en caso de error
- */
-int beginConnection(int cl_sck, char** pBuffer, char** nick) {
-
-    char *prefix = NULL, *command = NULL;
-    char *nickname = NULL, *username = NULL, *hostname = NULL, *servername = NULL, *realname = NULL, *pass = NULL;
-    char *msg = NULL;
-    char buffer[MAXLEN];
-    long retval, numCommand;
-    struct sockaddr_in cl_addr;
-    socklen_t len = sizeof(cl_addr);
-    char *cl_addName;
-    /*Flags control*/
-    int nickDone = 0, welcome = 0;
-
-    do {
-        /*Esperamos a la llegada de un mensaje*/
-        bzero(buffer, MAXLEN);
-        recv(cl_sck, buffer, MAXLEN, 0);
-        /*se lee el maximo posible, tener cuidado con el envio*/
-        *pBuffer = buffer;
-
-        do {
-            *pBuffer = IRC_UnPipelineCommands(*pBuffer, &command);
-            numCommand = IRC_CommandQuery(command);
-            switch (numCommand) {
-                /*PASS*/
-                case 1:
-                    /*La password se devuelve por pass*/
-                    retval = IRCParse_Pass(command, &prefix, &pass);
-
-                    /*control errores*/
-                    break;
-
-                /*NICK*/
-                case 2:
-                    /*El nick se devuelve por nick*/
-                    retval = IRCParse_Nick(command, &prefix, &nickname, &msg);
-                    nickDone = 1;
-                    /*control errores*/
-                    if (retval!= IRC_OK) {
-                        sendErrMsg(retval, cl_sck, "*", "*");
-                        nickDone = 0;
-                    }
-                    if(strlen(nickname)>MAX_NICK){
-                        sendErrMsg(IRCERR_INVALIDNICK,cl_sck,"*","*");
-                        nickDone= 0;
-                        free(nickname);nickname=NULL;
-                    }
-                    break;
-
-                    /*USER*/
-                case 3:
-                    if (!nickDone) break;
-                    /*Parseamos los datos del comando User*/
-                    retval = IRCParse_User(command, &prefix, &username, &hostname, &servername, &realname);
-                    /*control errores*/
-                    if (retval!=IRC_OK) {
-                        sendErrMsg(retval, cl_sck, "*", command);
-                        IRC_MFree(1,&nickname);
-                        return ERROR;
-                    }
-
-                    /*Obtenemos el nombre de servidor del cliente*/
-                    getpeername(cl_sck, (struct sockaddr *)&cl_addr, &len);
-                    cl_addName = inet_ntoa(cl_addr.sin_addr);
-                    /*Creamos el usuario*/
-                    retval = IRCTADUser_New(username, nickname, realname, pass, cl_addName, MY_ADDR, cl_sck);
-                    welcome = 1;
-                    /*control errores*/
-                    if (retval == IRCERR_INVALIDNICK) {
-                        sendErrMsg(retval, cl_sck, "*", nickname);
-                    } else if (retval == IRCERR_INVALIDIP) {
-                        sendErrMsg(retval, cl_sck, "*", nickname);
-                    } else if (retval != IRC_OK) {
-                        sendErrMsg(retval,cl_sck,"*",command);
-                    }
-                    break;
-
-                    /*OTHERWISE*/
-                default:
-                    //return numCommand;
-                    break;
-            }
-            /*liberamos command*/
-            free(command);
-        } while (*pBuffer);
-
-    } while (!welcome);
-    IRCMsg_RplWelcome(&command, MY_ADDR, nickname, nickname, username, cl_addName);
-    if (send(cl_sck, command, strlen(command) , 0) < 0)
-        perror("Error");
-    *nick = (char*)malloc((MAX_NICK+1)*sizeof(char));
-    if(*nick == NULL)
-        return -1;
-    strcpy(*nick, nickname);
-    IRC_MFree(7, &prefix, &command, &nickname, &username, &hostname, &servername,
-            &realname);
     return 0;
 
 }

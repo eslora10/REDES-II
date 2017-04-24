@@ -18,8 +18,17 @@ certificados:
 	cat servidorcert.pem servidorkey.pem > certs/servidor.pem
 	rm servidorkey.pem servidorcert.pem
 
-ssl:
-	gcc -o ssl pruebassl.c -lssl -lcrypto
+ssl: G-2301-04-P1-socket.o pruebassl.o G-2301-04-P3-ssl.o
+	gcc -o ssl pruebassl.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
+
+pruebassl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h
+	gcc -c pruebassl.c
+
+G-2301-04-P1-socket.o: sockets/G-2301-04-P1-socket.h
+	gcc -c sockets/G-2301-04-P1-socket.c
+
+G-2301-04-P3-ssl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h
+	gcc -c G-2301-04-P3-ssl.c
 
 clean: 
-	rm -f ssl *.o certs/*.*
+	rm -f ssl *.o certs/*.* 
