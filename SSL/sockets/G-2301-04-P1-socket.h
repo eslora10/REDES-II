@@ -88,4 +88,5 @@ void * attendClientSocket(void *sck);
  */
 int connectClientSocket(int sck, char* host_name, int port);
 
+
 #endif /*SOCKET_H*/

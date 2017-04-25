@@ -38,4 +38,30 @@ SSL* conectar_canal_seguro_SSL(SSL_CTX* ctx, int sck);
 SSL* aceptar_canal_seguro_SSL(SSL_CTX* ctx, int sck);
 
 
+/**
+ * @brief comprobará una vez realizado el handshake que el canal de comunicación se puede 
+ * considerar seguro
+ * @param ssl puntero a la estructura de conexión ssl
+ * @return -1 en caso de error
+ * @return 0 correcto
+ */
+int evaluar_post_connectar_SSL(const SSL* ssl);
+
+/**
+ * @brief Envia datos a traves de la conexion ssl preestablecida
+ * @param ssl puntero a la estructura de conexión ssl
+ * @return -1 en caso de error
+ * @return 0 correcto
+ */
+int enviar_datos_SSL(SSL* ssl, char* buffer, int nbytes);
+
+
+/**
+ * @brief Recibe datos a traves de la conexion ssl preestablecida
+ * @param ssl puntero a la estructura de conexión ssl
+ * @return <=0 en caso de error
+ * @return 0 correcto
+ */
+int recibir_datos_SSL(SSL* ssl, char* buffer, int nbytes); 
+
 #endif /*SSL_H*/

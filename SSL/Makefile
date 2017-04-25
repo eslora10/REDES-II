@@ -1,4 +1,4 @@
-all: certificados ssl
+all: certificados echo/servidor_echo echo/cliente_echo
 
 certificados:
 	openssl genrsa -out cakey.pem 2048
@@ -18,17 +18,20 @@ certificados:
 	cat servidorcert.pem servidorkey.pem > certs/servidor.pem
 	rm servidorkey.pem servidorcert.pem
 
-ssl: G-2301-04-P1-socket.o pruebassl.o G-2301-04-P3-ssl.o
-	gcc -o ssl pruebassl.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
+echo/servidor_echo: G-2301-04-P1-socket.o servidor_echo.o G-2301-04-P3-ssl.o
+	gcc -o echo/servidor_echo servidor_echo.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
 
-pruebassl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h
-	gcc -c -Wall pruebassl.c
+echo/cliente_echo: G-2301-04-P1-socket.o cliente_echo.o G-2301-04-P3-ssl.o
+	gcc -o echo/cliente_echo cliente_echo.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
 
-G-2301-04-P1-socket.o: sockets/G-2301-04-P1-socket.h
+servidor_echo.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h servidor_echo.c
+	gcc -c -Wall servidor_echo.c
+
+G-2301-04-P1-socket.o: sockets/G-2301-04-P1-socket.h sockets/G-2301-04-P1-socket.c
 	gcc -c -Wall sockets/G-2301-04-P1-socket.c
 
-G-2301-04-P3-ssl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h
+G-2301-04-P3-ssl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-ssl.c
 	gcc -c -Wall G-2301-04-P3-ssl.c
 
 clean: 
-	rm -f ssl *.o certs/*.* 
+	rm -f echo/servidor_echo *.o certs/*.* echo/*
