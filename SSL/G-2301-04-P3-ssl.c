@@ -16,13 +16,13 @@ SSL_CTX* nuevo_contexto_ssl() {
     /*Obtenemos el metodo de conexion*/
     method = SSLv23_method();
     if (!method) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return NULL;
     }
     /*Crea el nuevo contexto*/
     ctx = SSL_CTX_new(method);
     if (ctx == NULL) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return NULL;
     }
     return ctx;
@@ -41,28 +41,28 @@ SSL_CTX* nuevo_contexto_ssl() {
 int cargar_certificados(SSL_CTX* ctx, char* CertFile, char* CertPath) {
     /*Carga las CA propias*/
     if (!SSL_CTX_load_verify_locations(ctx, CertFile, CertFile)) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return -1;
     }
     /*Carga las CA conocidas*/
     if (!SSL_CTX_set_default_verify_paths(ctx)) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return -1;
     }
 
     /*Especificamos el certificado que usara la aplicacion*/
-    if (SSL_CTX_use_certificate_chain_file(ctx, CertPath) <= 0) {
-        ERR_print_errors_fp(stderr);
+    if (SSL_CTX_use_certificate_chain_file(ctx, CertPath) != 1) {
+        ERR_print_errors_fp(debug);
         return -1;
     }
     /*Especificamos la clave privada (chain)*/
-    if (SSL_CTX_use_PrivateKey_file(ctx, CertPath, SSL_FILETYPE_PEM) <= 0) {
-        ERR_print_errors_fp(stderr);
+    if (SSL_CTX_use_PrivateKey_file(ctx, CertPath, SSL_FILETYPE_PEM) != 1) {
+        ERR_print_errors_fp(debug);
         return -1;
     }
     /*Verifica la clave privada*/
-    if (!SSL_CTX_check_private_key(ctx)) {
-        fprintf(stderr, "La clave privada no coincide con la del certificado publico\n");
+    if (SSL_CTX_check_private_key(ctx) != 1) {
+        fprintf(debug, "La clave privada no coincide con la del certificado publico\n");
         return -1;
     }
     return 0;
@@ -92,13 +92,13 @@ SSL* nueva_conexion_ssl(SSL_CTX* ctx, int sck) {
     /*Creamos la estructura ssl con el canal seguro*/
     ssl = SSL_new(ctx);
     if (!ssl) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return NULL;
     }
 
     /*Asignamos a la estructura anterior el descriptor del socket en el que se conecta el cliente*/
     if (!SSL_set_fd(ssl, sck)) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return NULL;
     }
 
@@ -122,7 +122,7 @@ SSL* conectar_canal_seguro_SSL(SSL_CTX* ctx, int sck) {
 
     /*Esperamos el handshake por parte del cliente*/
     if (SSL_connect(ssl) <= 0) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return NULL;
     }
 
@@ -145,7 +145,7 @@ SSL* aceptar_canal_seguro_SSL(SSL_CTX* ctx, int sck) {
 
     /*Esperamos el handshake por parte del cliente*/
     if (SSL_accept(ssl) <= 0) {
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(debug);
         return NULL;
     }
 
@@ -193,7 +193,6 @@ int enviar_datos_SSL(SSL* ssl, char* buffer, int nbytes) {
 int recibir_datos_SSL(SSL* ssl, char* buffer, int nbytes) {
     return SSL_read(ssl, (void*) buffer, nbytes);
 }
-
 
 
 

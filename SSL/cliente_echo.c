@@ -8,16 +8,18 @@ int main(){
 
     ctx = fijar_contexto_SSL("certs/ca.pem", "certs/cliente.pem");
     if(!ctx){
-        fprintf(stderr, "Los certificados del cliente no son correctos\n");
+        fprintf(debug, "Los certificados del cliente no son correctos\n");
         return -1;
     }
     sck = openSocket(TCP);
     if (sck < 0){
         perror("Error abriendo socket");
+	fprintf(debug, "Error abriendo socket\n");
         return -1;
     }
     
     if(connectClientSocket(sck, "localhost", 6667) < 0){
+	fprintf(debug, "Error connect\n");
         perror("Error accept");
         return -1;
     }
@@ -28,7 +30,7 @@ int main(){
         return -1;
     }  
     if(evaluar_post_connectar_SSL(ssl) < 0){
-        fprintf(stderr, "El servidor no ha enviado ningun certificado o no es verificado por la CA\n");
+        fprintf(debug, "El servidor no ha enviado ningun certificado o no es verificado por la CA\n");
         return -1;
     }
 
@@ -37,14 +39,14 @@ int main(){
         scanf("%s[^\n]\n", buffer);
 
         if(enviar_datos_SSL(ssl, buffer, MAXLEN) <= 0){
-            fprintf(stderr, "Error al recibir datos\n");
+            fprintf(debug, "Error al recibir datos\n");
             return -1;
         }   
 	
 	bzero(buffer, MAXLEN);
      
 	if(recibir_datos_SSL(ssl, buffer, MAXLEN) <= 0){
-            fprintf(stderr, "Error al recibir datos\n");
+            fprintf(debug, "Error al recibir datos\n");
             return -1;
         }
 

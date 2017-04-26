@@ -6,6 +6,8 @@
 #include <openssl/ssl.h>
 #include "sockets/G-2301-04-P1-socket.h"
 
+FILE *debug;
+
 
 int inicializar_nivel_ssl();
 /**
