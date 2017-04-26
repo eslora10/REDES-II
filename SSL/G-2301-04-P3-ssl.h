@@ -6,8 +6,6 @@
 #include <openssl/ssl.h>
 #include "sockets/G-2301-04-P1-socket.h"
 
-FILE *debug;
-
 
 int inicializar_nivel_ssl();
 /**
@@ -17,7 +15,7 @@ int inicializar_nivel_ssl();
  * @return contexto creado
  * @return NULL en caso de error
 */
-SSL_CTX* fijar_contexto_SSL(char* cert_file, char* cert_path);
+SSL_CTX* fijar_contexto_SSL(char* ca_cert, char* clserv_cert);
 
 /**
  * @brief Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando 

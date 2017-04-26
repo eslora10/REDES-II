@@ -155,3 +155,72 @@ int connectClientSocket(int sck, char* host_name, int port) {
     return 0;
 
 }
+
+/**
+ * @brief Dado un socket o una estructura ssl envia datos al otro
+ * extremo de la conexion
+ * @param sck identificador de fichero con el socket
+ * @param ssl puntero a una estructura ssl. Si vale NULL se asume canal no seguro
+ * @param p protocolo TCP o UDP (se asume TCP por defecto)
+ * @param sockaddr puntero a una estructura con el host destino. Solo necesaria para UDP
+ * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
+ * @param data datos que se envian
+ * @param longitud de los datos que se envian
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int sendData(int sck, SSL *ssl, protocol p, const struct sockaddr *dest_addr, socklen_t addrlen, 
+                char *data, int len){
+
+    if(!ssl){
+        /*La conexion no es segura, se usan las funciones de la API de sockets*/
+        switch(p){
+            case UDP:
+                if(!dest_addr)
+                    /*No se ha especificado el host destino*/
+                    return -1;                
+                return sendto(sck, data, len, 0, dest_addr, addrlen);
+            default:
+                return send(sck, data, len, 0);
+        }
+    } else {
+        return enviar_datos_SSL(ssl, data, len);
+    }
+
+
+    return 0;
+}
+
+/**
+ * @brief Dado un socket o una estructura ssl recibe datos al otro
+ * extremo de la conexion
+ * @param sck identificador de fichero con el socket
+ * @param ssl puntero a una estructura ssl. Si vale NULL se asume canal no seguro
+ * @param p protocolo TCP o UDP (se asume TCP por defecto)
+ * @param sockaddr puntero a una estructura con el host destino. Solo necesaria para UDP
+ * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
+ * @param data datos que se envian
+ * @param longitud de los datos que se envian
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int receiveData(int sck, SSL *ssl, protocol p, struct sockaddr *dest_addr, socklen_t addrlen, 
+                char *data, int len){
+
+    if(!ssl){
+        /*La conexion no es segura, se usan las funciones de la API de sockets*/
+        switch(p){
+            case UDP:
+                if(!dest_addr)
+                    /*No se ha especificado el host destino*/
+                    return -1;                
+                return recvfrom(sck, data, len, 0, dest_addr, &addrlen);
+            default:
+                return recv(sck, data, len, 0);
+        }
+    } else {
+        return recibir_datos_SSL(ssl, data, len);
+    }
+
+
+    return 0;
+}
+

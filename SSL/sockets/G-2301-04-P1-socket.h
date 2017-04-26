@@ -31,6 +31,8 @@
 #include <syslog.h>
 #include <fcntl.h>
 
+#include "../G-2301-04-P3-ssl.h"
+
 /**
  * @def MAXLEN
  * @brief Longitud maxima de un comando IRC
@@ -87,6 +89,37 @@ void * attendClientSocket(void *sck);
  * @return 0 si todo ha ido bien, -1 en caso de error
  */
 int connectClientSocket(int sck, char* host_name, int port);
+
+/**
+ * @brief Dado un socket o una estructura ssl envia datos al otro
+ * extremo de la conexion
+ * @param sck identificador de fichero con el socket
+ * @param ssl puntero a una estructura ssl. Si vale NULL se asume canal no seguro
+ * @param p protocolo TCP o UDP (se asume TCP por defecto)
+ * @param sockaddr puntero a una estructura con el host destino. Solo necesaria para UDP
+ * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
+ * @param data datos que se envian
+ * @param longitud de los datos que se envian
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int sendData(int sck, SSL *ssl, protocol p, const struct sockaddr *dest_addr, socklen_t addrlen, 
+                char *data, int len);
+
+
+/**
+ * @brief Dado un socket o una estructura ssl recibe datos al otro
+ * extremo de la conexion
+ * @param sck identificador de fichero con el socket
+ * @param ssl puntero a una estructura ssl. Si vale NULL se asume canal no seguro
+ * @param p protocolo TCP o UDP (se asume TCP por defecto)
+ * @param sockaddr puntero a una estructura con el host destino. Solo necesaria para UDP
+ * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
+ * @param data datos que se envian
+ * @param longitud de los datos que se envian
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int receiveData(int sck, SSL *ssl, protocol p, struct sockaddr *dest_addr, socklen_t addrlen, 
+                char *data, int len);
 
 
 #endif /*SOCKET_H*/
