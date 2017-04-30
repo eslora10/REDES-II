@@ -1,4 +1,4 @@
-#include "G-2301-04-P3-ssl.h"
+#include "../includes/G-2301-04-P3-redes2.h"
 
 int main() {
     SSL_CTX* ctx = NULL;
@@ -6,7 +6,7 @@ int main() {
     int sck, cl_sck;
     char buffer[MAXLEN];
 
-    ctx = fijar_contexto_SSL("certs/ca.pem", "certs/servidor.pem");
+    ctx = inicializar_nivel_SSL("certs/ca.pem", "certs/servidor.pem");
     if (!ctx) {
         fprintf(stderr, "Los certificados del servidor no son correctos\n");
         return -1;
@@ -66,6 +66,7 @@ int main() {
         }
     } while(strcmp(buffer, "exit"));
 
+    cerrar_canal_SSL(ssl, ctx);
     close(sck);
     close(cl_sck);
     return 0;

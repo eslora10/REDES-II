@@ -1,3 +1,30 @@
+CC = gcc
+CFLAGS = -pedantic -Wall  -I $(IDIR)
+LIBS = -lircredes -lircinterface -lirctad -lsoundredes -lpthread -lredes2 -lssl -lcrypto
+
+#directorios
+IDIR=includes
+ODIR=obj
+LDIR=lib
+SDIR=src
+SLDIR=srclib
+OLDIR=objlib
+
+#rutas de los ficheros
+_DEPS = G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-redes2.h
+
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ = cliente_echo.o servidor_echo.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+_SRCL = G-2301-04-P1-socket.c G-2301-04-P3-ssl.c
+SRCL = $(patsubst %,$(SLDIR)/%,$(_SRCL)) 
+
+_OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o
+OBJL = $(patsubst %,$(OLDIR)/%,$(_OBJL))
+
+
 all: certificados echo/servidor_echo echo/cliente_echo
 
 certificados:
@@ -19,20 +46,34 @@ certificados:
 
 	rm cakey.pem cacert.pem
 
-echo/servidor_echo: G-2301-04-P1-socket.o servidor_echo.o G-2301-04-P3-ssl.o
-	gcc -o echo/servidor_echo servidor_echo.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
+#$@ == parte izq de ":"
+#$< == primer elemento de la lista de dependencias
+#$^ == parte der de ":"
 
-echo/cliente_echo: G-2301-04-P1-socket.o cliente_echo.o G-2301-04-P3-ssl.o
-	gcc -o echo/cliente_echo cliente_echo.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
+$(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-servidor_echo.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h servidor_echo.c
-	gcc -c -Wall servidor_echo.c
+$(OLDIR)/%.o: $(SLDIR)/%.c $(DEPS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-G-2301-04-P1-socket.o: sockets/G-2301-04-P1-socket.h sockets/G-2301-04-P1-socket.c G-2301-04-P3-ssl.h
-	gcc -c -Wall sockets/G-2301-04-P1-socket.c
+libredes2.a: $(OBJL)
+	ar rcs $@ $^
 
-G-2301-04-P3-ssl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-ssl.c
-	gcc -c -Wall G-2301-04-P3-ssl.c
+#G-2301-04-P1-server: libredes2.a
+#	$(CC) -L. $(SDIR)/G-2301-04-P1-server.c $(SLDIR)/*.c $(CFLAGS) $(LIBS)
+#	mv a.out G-2301-04-P1-server
 
-clean: 
-	rm -f echo/servidor_echo *.o certs/*.* echo/*
+echo/servidor_echo: libredes2.a
+	$(CC) -L. $(SDIR)/servidor_echo.c $(SLDIR)/*.c $(CFLAGS) $(LIBS)
+	mv a.out echo/servidor_echo 
+
+echo/cliente_echo: libredes2.a
+	$(CC) -L. $(SDIR)/cliente_echo.c $(SLDIR)/*.c $(CFLAGS) $(LIBS)
+	mv a.out echo/cliente_echo  
+	mv libredes2.a $(LDIR)
+
+.PHONY: clean
+clean:
+	rm -f $(ODIR)/*.o $(OLDIR)/*.o *~ core $(INCDIR)/*~
+	rm -f G-2301-04-P1-server $(LDIR)/libredes2.a
+	rm -f certs/*.* echo/*

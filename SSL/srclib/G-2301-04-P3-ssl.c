@@ -1,4 +1,21 @@
-#include "G-2301-04-P3-ssl.h"
+#include "../includes/G-2301-04-P3-redes2.h"
+
+/**
+ * @brief Realiza todas las llamadas necesarias para que la apli-
+ * cación pueda usar la capa segura SSL.
+ * @param cert_file nombre del certificado de la CA
+ * @param cert_path ruta del certificado de la CA
+ * @return contexto creado
+ * @return NULL en caso de error
+*/
+SSL_CTX* inicializar_nivel_SSL(char *ca_cert, char *clserv_pem){
+    /*carga los mensajes de error*/
+    SSL_load_error_strings();
+    /*Carga todos los algoritmos sostenidos*/
+    SSL_library_init();
+
+    return fijar_contexto_SSL(ca_cert, clserv_pem);
+}
 
 /**
  * @brief Inicia un nuevo contexto para la conexion ssl del servidor
@@ -9,10 +26,6 @@ SSL_CTX* nuevo_contexto_ssl() {
     const SSL_METHOD *method = NULL;
     SSL_CTX *ctx = NULL;
 
-    /*carga los mensajes de error*/
-    SSL_load_error_strings();
-    /*Carga todos los algoritmos sostenidos*/
-    SSL_library_init();
     /*Obtenemos el metodo de conexion*/
     method = SSLv23_method();
     if (!method) {
@@ -198,6 +211,19 @@ int enviar_datos_SSL(SSL* ssl, char* buffer, int nbytes) {
 int recibir_datos_SSL(SSL* ssl, char* buffer, int nbytes) {
     return SSL_read(ssl, (void*) buffer, nbytes);
 }
+
+
+/**
+ * @brief Libera los recursos reservados para la capa ssl
+ * @param ssl puntero a la estructura de conexión ssl
+ * @param ctx contexto creado para la conexion ssl
+ */
+void cerrar_canal_SSL(SSL *ssl, SSL_CTX* ctx){
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+}
+
 
 
 

@@ -7,7 +7,7 @@
  * @file G-2301-04-P1-socket.h
  */
 
-#include "G-2301-04-P1-socket.h"
+#include "../includes/G-2301-04-P3-redes2.h"
 
 /**
  * @brief Transforma al proceso que la llama en daemon y abre el log del sistema,

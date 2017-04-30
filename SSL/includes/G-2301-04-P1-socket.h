@@ -31,7 +31,7 @@
 #include <syslog.h>
 #include <fcntl.h>
 
-#include "../G-2301-04-P3-ssl.h"
+#include "G-2301-04-P3-ssl.h"
 
 /**
  * @def MAXLEN
@@ -73,12 +73,6 @@ int bindSocket(int sck, uint16_t port, int max_clients);
  * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 int acceptSocket(int sck);
-
-/**
- * @brief Dado un socket acepta la peticion de un cliente
- * @param sck descriptor del socket
- */
-void * attendClientSocket(void *sck);
 
 /**
  * @brief Dado un socket, conecta con una IP y un puerto especifico.
