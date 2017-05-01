@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -pedantic -Wall  -I $(IDIR)
-LIBS = -lircredes -lircinterface -lirctad -lsoundredes -lpthread -lredes2 -lssl -lcrypto
+CFLAGS = -pedantic -Wall -pthread  -I $(IDIR)
+LIBS = -lssl -lcrypto -lircredes -lircinterface -lirctad -lsoundredes -lpthread 
 
 #directorios
 IDIR=includes
@@ -21,11 +21,11 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 _SRCL = G-2301-04-P1-socket.c G-2301-04-P3-ssl.c
 SRCL = $(patsubst %,$(SLDIR)/%,$(_SRCL)) 
 
-_OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o
+_OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o G-2301-04-P1-command.o
 OBJL = $(patsubst %,$(OLDIR)/%,$(_OBJL))
 
 
-all: certificados echo/servidor_echo echo/cliente_echo
+all: certificados echo/servidor_echo echo/cliente_echo cliente_servidor/servidor_IRC
 
 certificados:
 	openssl genrsa -out cakey.pem 2048
@@ -56,24 +56,20 @@ $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 $(OLDIR)/%.o: $(SLDIR)/%.c $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-libredes2.a: $(OBJL)
+$(LDIR)/libredes2.a: $(OBJL)
 	ar rcs $@ $^
 
-#G-2301-04-P1-server: libredes2.a
-#	$(CC) -L. $(SDIR)/G-2301-04-P1-server.c $(SLDIR)/*.c $(CFLAGS) $(LIBS)
-#	mv a.out G-2301-04-P1-server
+cliente_servidor/servidor_IRC: $(LDIR)/libredes2.a src/G-2301-04-P1-server.c
+	$(CC) -o $@ src/G-2301-04-P1-server.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
 
-echo/servidor_echo: libredes2.a
-	$(CC) -L. $(SDIR)/servidor_echo.c $(SLDIR)/*.c $(CFLAGS) $(LIBS)
-	mv a.out echo/servidor_echo 
+echo/servidor_echo: $(LDIR)/libredes2.a src/servidor_echo.c
+	$(CC) -o $@ src/servidor_echo.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
 
-echo/cliente_echo: libredes2.a
-	$(CC) -L. $(SDIR)/cliente_echo.c $(SLDIR)/*.c $(CFLAGS) $(LIBS)
-	mv a.out echo/cliente_echo  
-	mv libredes2.a $(LDIR)
+echo/cliente_echo: $(LDIR)/libredes2.a src/cliente_echo.c
+	$(CC) -o $@ src/cliente_echo.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 clean:
 	rm -f $(ODIR)/*.o $(OLDIR)/*.o *~ core $(INCDIR)/*~
-	rm -f G-2301-04-P1-server $(LDIR)/libredes2.a
-	rm -f certs/*.* echo/*
+	rm -f $(LDIR)/libredes2.a
+	rm -f certs/*.* echo/* cliente_servidor/*

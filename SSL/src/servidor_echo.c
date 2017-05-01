@@ -1,4 +1,5 @@
-#include "../includes/G-2301-04-P3-redes2.h"
+#include "../includes/G-2301-04-P3-ssl.h"
+#include "../includes/G-2301-04-P1-socket.h"
 
 int main() {
     SSL_CTX* ctx = NULL;

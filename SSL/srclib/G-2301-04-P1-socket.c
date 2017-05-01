@@ -166,7 +166,8 @@ int connectClientSocket(int sck, char* host_name, int port) {
  * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
  * @param data datos que se envian
  * @param longitud de los datos que se envian
- * @return 0 si todo ha ido bien, -1 en caso de error
+ * @return numero de bytes leidos si todo correcto
+ * @return -1 en caso de error
  */
 int sendData(int sck, SSL *ssl, protocol p, const struct sockaddr *dest_addr, socklen_t addrlen, 
                 char *data, int len){
@@ -200,7 +201,8 @@ int sendData(int sck, SSL *ssl, protocol p, const struct sockaddr *dest_addr, so
  * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
  * @param data datos que se envian
  * @param longitud de los datos que se envian
- * @return 0 si todo ha ido bien, -1 en caso de error
+ * @return numero de bytes enviados si todo correcto
+ * @return -1 en caso de error
  */
 int receiveData(int sck, SSL *ssl, protocol p, struct sockaddr *dest_addr, socklen_t addrlen, 
                 char *data, int len){
