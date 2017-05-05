@@ -172,7 +172,16 @@ int privmsgCommand(char* command, char* nick, int sck, SSL *ssl);
 int motdCommand(char* command, char* nick, int sck, SSL *ssl);
 
 /**
- * @brief Ejecuta el comando PING
+ * @brief Ejecuta el comando WHO
+ * @param command comando que se va a parsear y ejecutar
+ * @param nick nickname del usuario que ejecuta el comando
+ * @param sck socket en el que se recibio el comando
+ * @return -1 en caso de fallo, 0 OK
+ */
+int whoCommand(char* command, char* nick, int sck, SSL *ssl);
+
+/**
+ * @brief Ejecuta el comando WHOIS
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
@@ -206,8 +215,8 @@ typedef int (*pFuncs)(char *command, char* nick, int sck, SSL *ssl);
 
 /**
  * @typedef Sck_SSL
- * @brief Estructura argumento de la funcion attendClient que contiene el 
- * en caso de que el cliente se conecte en el puerto 6667 el socket y en caso 
+ * @brief Estructura argumento de la funcion attendClient que contiene el
+ * en caso de que el cliente se conecte en el puerto 6667 el socket y en caso
  * de ser en el 6669 el socket y la estructura ssl ya inicializada
  */
 typedef struct _{

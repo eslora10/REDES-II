@@ -39,13 +39,13 @@ void* SSLConnections(void *kk){
     if (sck_ssl < 0) {
         perror("Error abriendo socket");
         pthread_exit(NULL);
-    }   
+    }
     if (bindSocket(sck_ssl, port, 1) < 0) {
         perror("Error en bind");
         close(sck_ssl);
         pthread_exit(NULL);
-    }	
-    
+    }
+
     while(1){
         /*Recibimos conexiones de clientes*/
         cl_sck = acceptSocket(sck_ssl);
@@ -54,7 +54,7 @@ void* SSLConnections(void *kk){
             close(sck);
             pthread_exit(NULL);
         }
-        
+
         /*Intentamos el hanshake con el cliente*/
         ssl = aceptar_canal_seguro_SSL(ctx, cl_sck);
         if (!ssl) {
@@ -63,7 +63,7 @@ void* SSLConnections(void *kk){
             close(cl_sck);
             pthread_exit(NULL);
         }
-        
+
         /*Comprobamos si los certificados del cliente son correctos*/
         if (evaluar_post_connectar_SSL(ssl) < 0) {
             close(sck);
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
     pthread_t thread, ssl_thread;
     Sck_SSL *argAttend = NULL;
 
-    
+
     for (i = 0; i < 37; i++)
         Commands[i] = FuncDefault;
     Commands[2] = nickCommand;
@@ -133,6 +133,7 @@ int main(int argc, char** argv) {
     Commands[15] = kickCommand;
     Commands[16] = privmsgCommand;
     Commands[18] = motdCommand;
+    Commands[30] = whoCommand;
     Commands[31] = whoisCommand;
     Commands[34] = pingCommand;
     Commands[37] = awayCommand;
@@ -163,8 +164,8 @@ int main(int argc, char** argv) {
                 }
             case '2':
             case '3':
-                /*Bandera de ssl*/	    
-                
+                /*Bandera de ssl*/
+
                 break;
             case '4':
             case '5':
@@ -209,9 +210,9 @@ int main(int argc, char** argv) {
             close(cl_sck);
             syslog(LOG_ERR, "Error de memoria");
             return -1;
-        }  
+        }
         argAttend->sck = cl_sck;
-        argAttend->ssl = NULL;          
+        argAttend->ssl = NULL;
         /*Creamos un hilo y le asignamos la funcion attendClientSockeet*/
         if (pthread_create(&thread, NULL, attendClientSocket, (void *) argAttend) < 0) {
             close(cl_sck);
