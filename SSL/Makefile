@@ -1,37 +1,78 @@
-all: certificados echo/servidor_echo echo/cliente_echo
+CC = gcc
+CFLAGS = -pedantic -Wall -pthread `pkg-config --cflags gtk+-3.0` -I $(IDIR)
+LIBS = -lssl -lcrypto -lircredes -lircinterface -lirctad -lsoundredes -lpthread -rdynamic `pkg-config --libs gtk+-3.0`
+
+#directorios
+IDIR=includes
+ODIR=obj
+LDIR=lib
+SDIR=src
+SLDIR=srclib
+OLDIR=objlib
+
+#rutas de los ficheros
+_DEPS = G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-redes2.h G-2301-04-P1-command.h G-2301-04-P2-userCommands.h G-2301-04-P2-messages.h G-2301-04-P2-files.h
+
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ = cliente_echo.o servidor_echo.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+_SRCL = G-2301-04-P1-socket.c G-2301-04-P3-ssl.c G-2301-04-P1-command.c G-2301-04-P2-userCommands.c G-2301-04-P2-messages.c G-2301-04-P2-files.c
+SRCL = $(patsubst %,$(SLDIR)/%,$(_SRCL)) 
+
+_OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o G-2301-04-P1-command.o G-2301-04-P2-userCommands.o G-2301-04-P2-messages.o G-2301-04-P2-files.o
+OBJL = $(patsubst %,$(OLDIR)/%,$(_OBJL))
+
+
+all: certificados echo/servidor_echo echo/cliente_echo cliente_servidor/servidor_IRC cliente_servidor/cliente_IRC
 
 certificados:
 	openssl genrsa -out cakey.pem 2048
 	openssl req -new -x509 -key cakey.pem -out cacert.pem -subj /CN=Redes2\ CA
 	cat cacert.pem cakey.pem > certs/ca.pem
-	rm cakey.pem cacert.pem
-
+	
 	openssl genrsa -out clientekey.pem 2048
 	openssl req -new -key clientekey.pem -out clientecert.pem -subj /CN=G-2301-04-P3-client
 	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in clientecert.pem -out clientecert.pem 
-	cat clientecert.pem clientekey.pem > certs/cliente.pem
+	cat clientecert.pem clientekey.pem cacert.pem > certs/cliente.pem
 	rm clientekey.pem clientecert.pem
 
 	openssl genrsa -out servidorkey.pem 2048
 	openssl req -new -key servidorkey.pem -out servidorcert.pem -subj /CN=G-2301-04-P3-server
 	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in servidorcert.pem -out servidorcert.pem 
-	cat servidorcert.pem servidorkey.pem > certs/servidor.pem
+	cat servidorcert.pem servidorkey.pem cacert.pem > certs/servidor.pem
 	rm servidorkey.pem servidorcert.pem
 
-echo/servidor_echo: G-2301-04-P1-socket.o servidor_echo.o G-2301-04-P3-ssl.o
-	gcc -o echo/servidor_echo servidor_echo.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
+	rm cakey.pem cacert.pem
 
-echo/cliente_echo: G-2301-04-P1-socket.o cliente_echo.o G-2301-04-P3-ssl.o
-	gcc -o echo/cliente_echo cliente_echo.o G-2301-04-P1-socket.o G-2301-04-P3-ssl.o -lssl -lcrypto
+#$@ == parte izq de ":"
+#$< == primer elemento de la lista de dependencias
+#$^ == parte der de ":"
 
-servidor_echo.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h servidor_echo.c
-	gcc -c -Wall servidor_echo.c
+$(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-G-2301-04-P1-socket.o: sockets/G-2301-04-P1-socket.h sockets/G-2301-04-P1-socket.c
-	gcc -c -Wall sockets/G-2301-04-P1-socket.c
+$(OLDIR)/%.o: $(SLDIR)/%.c $(DEPS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-G-2301-04-P3-ssl.o: sockets/G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-ssl.c
-	gcc -c -Wall G-2301-04-P3-ssl.c
+$(LDIR)/libredes2.a: $(OBJL)
+	ar rcs $@ $^
 
-clean: 
-	rm -f echo/servidor_echo *.o certs/*.* echo/*
+cliente_servidor/cliente_IRC: $(LDIR)/libredes2.a src/xchat2.c
+	$(CC) -o $@ src/xchat2.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+
+cliente_servidor/servidor_IRC: $(LDIR)/libredes2.a src/G-2301-04-P1-server.c
+	$(CC) -o $@ src/G-2301-04-P1-server.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+
+echo/servidor_echo: $(LDIR)/libredes2.a src/servidor_echo.c
+	$(CC) -o $@ src/servidor_echo.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+
+echo/cliente_echo: $(LDIR)/libredes2.a src/cliente_echo.c
+	$(CC) -o $@ src/cliente_echo.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+clean:
+	rm -f $(ODIR)/*.o $(OLDIR)/*.o *~ core $(INCDIR)/*~
+	rm -f $(LDIR)/libredes2.a
+	rm -f certs/*.* echo/* cliente_servidor/*

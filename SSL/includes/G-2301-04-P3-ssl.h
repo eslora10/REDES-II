@@ -4,12 +4,18 @@
 #include <stdio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-#include "sockets/G-2301-04-P1-socket.h"
+#include "G-2301-04-P1-socket.h"
 
-FILE *debug;
+/**
+ * @brief Realiza todas las llamadas necesarias para que la apli-
+ * cación pueda usar la capa segura SSL.
+ * @param cert_file nombre del certificado de la CA
+ * @param cert_path ruta del certificado de la CA
+ * @return contexto creado
+ * @return NULL en caso de error
+*/
+SSL_CTX* inicializar_nivel_SSL(char *ca_cert, char *clserv_pem);
 
-
-int inicializar_nivel_ssl();
 /**
  * @brief Inicializa el contexto que será utilizado para la creación de canales seguros mediante SSL
  * @param cert_file nombre del certificado de la CA
@@ -17,7 +23,7 @@ int inicializar_nivel_ssl();
  * @return contexto creado
  * @return NULL en caso de error
 */
-SSL_CTX* fijar_contexto_SSL(char* cert_file, char* cert_path);
+SSL_CTX* fijar_contexto_SSL(char* ca_cert, char* clserv_cert);
 
 /**
  * @brief Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando 
@@ -64,6 +70,13 @@ int enviar_datos_SSL(SSL* ssl, char* buffer, int nbytes);
  * @return <=0 en caso de error
  * @return 0 correcto
  */
-int recibir_datos_SSL(SSL* ssl, char* buffer, int nbytes); 
+int recibir_datos_SSL(SSL* ssl, char* buffer, int nbytes);
+
+/**
+ * @brief Libera los recursos reservados para la capa ssl
+ * @param ssl puntero a la estructura de conexión ssl
+ * @param ctx contexto creado para la conexion ssl
+ */
+void cerrar_canal_SSL(SSL *ssl, SSL_CTX* ctx); 
 
 #endif /*SSL_H*/
