@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -pedantic -Wall -pthread  -I $(IDIR)
-LIBS = -lssl -lcrypto -lircredes -lircinterface -lirctad -lsoundredes -lpthread 
+CFLAGS = -pedantic -Wall -pthread `pkg-config --cflags gtk+-3.0` -I $(IDIR)
+LIBS = -lssl -lcrypto -lircredes -lircinterface -lirctad -lsoundredes -lpthread -rdynamic `pkg-config --libs gtk+-3.0`
 
 #directorios
 IDIR=includes
@@ -11,21 +11,21 @@ SLDIR=srclib
 OLDIR=objlib
 
 #rutas de los ficheros
-_DEPS = G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-redes2.h
+_DEPS = G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-redes2.h G-2301-04-P1-command.h G-2301-04-P2-userCommands.h G-2301-04-P2-messages.h G-2301-04-P2-files.h
 
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = cliente_echo.o servidor_echo.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_SRCL = G-2301-04-P1-socket.c G-2301-04-P3-ssl.c
+_SRCL = G-2301-04-P1-socket.c G-2301-04-P3-ssl.c G-2301-04-P1-command.c G-2301-04-P2-userCommands.c G-2301-04-P2-messages.c G-2301-04-P2-files.c
 SRCL = $(patsubst %,$(SLDIR)/%,$(_SRCL)) 
 
-_OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o G-2301-04-P1-command.o
+_OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o G-2301-04-P1-command.o G-2301-04-P2-userCommands.o G-2301-04-P2-messages.o G-2301-04-P2-files.o
 OBJL = $(patsubst %,$(OLDIR)/%,$(_OBJL))
 
 
-all: certificados echo/servidor_echo echo/cliente_echo cliente_servidor/servidor_IRC
+all: certificados echo/servidor_echo echo/cliente_echo cliente_servidor/servidor_IRC cliente_servidor/cliente_IRC
 
 certificados:
 	openssl genrsa -out cakey.pem 2048
@@ -58,6 +58,9 @@ $(OLDIR)/%.o: $(SLDIR)/%.c $(DEPS)
 
 $(LDIR)/libredes2.a: $(OBJL)
 	ar rcs $@ $^
+
+cliente_servidor/cliente_IRC: $(LDIR)/libredes2.a src/xchat2.c
+	$(CC) -o $@ src/xchat2.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
 
 cliente_servidor/servidor_IRC: $(LDIR)/libredes2.a src/G-2301-04-P1-server.c
 	$(CC) -o $@ src/G-2301-04-P1-server.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
