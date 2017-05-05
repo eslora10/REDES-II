@@ -143,7 +143,7 @@ void* attendClientSocket(void *sck_ssl) {
 
     do {
         bzero(buffer, MAXLEN);
-        
+
         if (receiveData(cl_sck, ssl, TCP, NULL, 0, buffer, MAXLEN) <= 0) {
             /*Se ha producido un error o el cliente ha cerrado la conexion*/
             IRCTAD_Quit (nick);
@@ -285,7 +285,7 @@ int FuncDefault(char* command, char* nick, int sck, SSL *ssl) {
     if (IRCMsg_ErrUnKnownCommand(&rpl, MY_ADDR, nick, command) != IRC_OK) {
         return -1;
     }
-    
+
     sendData(sck, ssl, TCP, NULL, 0, rpl, strlen(rpl));
 
     free(rpl);
@@ -571,7 +571,7 @@ int namesCommand(char* command, char* nick, int sck, SSL *ssl) {
  * @brief Funcion interna para el comando NAMES. Se encarga de de obtener la
  * lista de nicks en un canal y generar los mensajes de NAMES y END NAMES LIST
  * @param msgL cadena donde se guarda el mensaje de list
- * @param errmsg en caso de que haya algun error se generara el correspondiente 
+ * @param errmsg en caso de que haya algun error se generara el correspondiente
  * mensaje
  * @param chan canal del que se obtiene el mensaje
  * @param nick nick del usuario que ejecuta el comando
@@ -589,7 +589,7 @@ int getListMsg(char **msgL, char **errmsg, char *chan, char *nick){
     }
     /*Cogemos el modo del canal para ver que no es secreto*/
     mode = IRCTADChan_GetModeInt(chan);
-    if (((mode & IRCMODE_SECRET) == IRCMODE_SECRET) && 
+    if (((mode & IRCMODE_SECRET) == IRCMODE_SECRET) &&
         IRCTAD_TestUserOnChannel(chan, nick) != IRC_OK) {
         /*El canal es secretoy el usuario no esta en el canal*/
         IRC_MFree(1, &topic);
@@ -598,7 +598,7 @@ int getListMsg(char **msgL, char **errmsg, char *chan, char *nick){
     sprintf(numUsers, "%ld", IRCTADChan_GetNumberOfUsers(chan));
     if(!topic)
         IRCMsg_RplList(msgL, MY_ADDR, nick, chan, numUsers, "");
-    else 
+    else
         IRCMsg_RplList(msgL, MY_ADDR, nick, chan, numUsers, topic);
 
     free(topic);
@@ -659,7 +659,7 @@ int listCommand(char* command, char* nick, int sck, SSL *ssl) {
                 sendData(sck, ssl, TCP, NULL, 0, errmsg, strlen(errmsg));
             else if (msgL)
                 sendData(sck, ssl, TCP, NULL, 0, msgL, strlen(msgL));
-            IRC_MFree(3, &errmsg, &msgL, &listChan[i]);        
+            IRC_MFree(3, &errmsg, &msgL, &listChan[i]);
         }
     }
     sendData(sck, ssl, TCP, NULL, 0, msgLE, strlen(msgLE));
@@ -1016,6 +1016,103 @@ long channelsMode(char **chanlist, char *user, char *nick) {
     }
     free(channelsArray);
     *chanlist = channelslist;
+    return 0;
+}
+
+/**
+ * @brief Ejecuta el comando WHO
+ * @param command comando que se va a parsear y ejecutar
+ * @param nick nickname del usuario que ejecuta el comando
+ * @param sck socket en el que se recibio el comando
+ * @return -1 en caso de fallo, 0 OK
+ */
+int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
+
+    char *prefix = NULL, *errmsg = NULL;
+    char *user = NULL, *real = NULL, *host = NULL, *IP = NULL;
+    char *away = NULL;
+    char *rplWho = NULL, *rplEnd = NULL;
+    int sck2 = 0;
+    long id = 0, retval = 0, actionTS = 0, creationTS = 0 ,num = 0;
+
+    char *mask =NULL, *oppar=NULL;
+    char **nicks =NULL;
+
+    char aste = '*';
+
+    retval = IRCParse_Who (command, &prefix, &mask, &oppar);
+    if (retval == IRCERR_NOSTRING || retval == IRCERR_ERRONEUSCOMMAND) {
+        IRCMsg_ErrNoNickNameGiven(&errmsg, MY_ADDR, nick);
+        sendData(sck, ssl, TCP, NULL, 0, errmsg, strlen(errmsg));
+        IRC_MFree(2, &prefix, &errmsg);
+        return -1;
+    }
+    /*who un solo user*/
+    if(mask != NULL && mask[0] != '#'){
+
+        retval = IRCTADUser_GetData(&id, &user, &mask, &real, &host, &IP, &sck2,
+                &creationTS, &actionTS, &away);
+
+        IRCMsg_RplWhoReply (&rplWho, MY_ADDR, nick, mask, user, host, IP, mask, "H", 0, real);
+        sendData(sck, ssl, TCP, NULL, 0, rplWho, strlen(rplWho));
+
+        IRC_MFree(6, &user, &real, &host, &IP, &away, &rplWho);
+
+        IRCMsg_RplEndOfWho (&rplEnd, MY_ADDR, nick, nick);
+        sendData(sck, ssl, TCP, NULL, 0, rplEnd, strlen(rplEnd));
+
+        IRC_MFree(4, &prefix,&rplEnd, &mask, &oppar);
+
+        return 0;
+    }
+    /*Caso mask vacio, imprimimos todo el canal*/
+    if(mask==NULL){
+
+        mask = &aste;
+        IRCTADUser_GetNickList (&nicks, &num);
+
+    /*Caso mask vacio, imprimimos todo el canal*/
+    }else if (mask[0] == '#'){
+
+        retval = IRCTAD_ListNicksOnChannelArray(mask, &nicks, &num);
+        if (retval == IRCERR_NOVALIDCHANNEL) {
+            sendErrMsg(retval, sck, ssl, nick, command);
+            IRC_MFree(2, &prefix, &mask);
+            return -1;
+        }
+
+        if (retval != IRC_OK) {
+            sendErrMsg(retval, sck, ssl, nick, command);
+            IRC_MFree(2, &prefix, &mask);
+            return -1;
+        }
+    }
+
+    /*iteramos en los usuarios del canal*/
+    for (int i = 0; i < num; i++) {
+
+        retval = IRCTADUser_GetData(&id, &user, &nicks[i], &real, &host, &IP, &sck2,
+                &creationTS, &actionTS, &away);
+
+        IRCMsg_RplWhoReply (&rplWho, MY_ADDR, nick, mask, user, host, IP, nicks[i], "H", 0, real);
+        sendData(sck, ssl, TCP, NULL, 0, rplWho, strlen(rplWho));
+
+        IRC_MFree(6, &user, &real, &host, &IP, &away, &rplWho);
+        free(nicks[i]);
+        nicks[i] = NULL;
+    }
+    free(nicks);
+
+    IRCMsg_RplEndOfWho (&rplEnd, MY_ADDR, nick, nick);
+    sendData(sck, ssl, TCP, NULL, 0, rplEnd, strlen(rplEnd));
+
+
+    if( *mask =='*')
+        IRC_MFree(3, &prefix,&rplEnd, &oppar);
+    else
+        IRC_MFree(4, &prefix,&rplEnd, &mask, &oppar);
+
+
     return 0;
 }
 
