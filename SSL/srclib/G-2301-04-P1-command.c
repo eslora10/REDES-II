@@ -173,6 +173,7 @@ void* attendClientSocket(void *sck_ssl) {
     free(buffer);
     free(nick);
     close(cl_sck);
+    cerrar_canal_SSL(ssl, NULL);
 
     pthread_exit(NULL);
 }
