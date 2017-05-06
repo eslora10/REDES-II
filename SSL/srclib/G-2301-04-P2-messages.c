@@ -746,16 +746,16 @@ int msgPing(char *m_in) {
         return -1;
     /*enviamos el pong*/
     if (IRCMsg_Pong(&msgServer, NULL, server, NULL, "") != IRC_OK) {
-        IRCInterface_WriteSystem(NULL, "PONG");
+        IRCInterface_WriteSystemThread(NULL, "PONG");
         return -1;
     }
 
     if (send(sck, msgServer, strlen(msgServer), 0) <= 0) {
-        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
         return -1;
     }
 
-    IRCInterface_PlaneRegisterOutMessage(msgServer);
+    IRCInterface_PlaneRegisterOutMessageThread(msgServer);
 
     IRC_MFree(4, &prefix, &server, &server2, &msgRec, &msgServer);
 
@@ -781,7 +781,7 @@ int msgTopicChanged(char *m_in) {
     sprintf(msgPrint, "%s ha cambiado el tema a: %s", nick, topic);
 
     /*Cambiamos el topic*/
-    IRCInterface_SetTopic(topic);
+    IRCInterface_SetTopicThread(topic);
 
     /*Escribimos en la ventana el mensaje*/
     IRC_ToLower(channel);
@@ -833,7 +833,7 @@ int msgKick(char *m_in) {
     char *nick, msg[512], *prefix, *channel, *comment, *origin;
     char *kicked = NULL, *user = NULL, *realname = NULL, *password = NULL, *server = NULL;
     int port = 0, ssl = 0;
-    nick = prefix = channel = comment = NULL;
+    nick = prefix = channel = comment = origin = NULL;
 
     if (IRCParse_Kick(m_in, &prefix, &channel, &nick, &comment) != IRC_OK)
         return -1;
@@ -846,12 +846,13 @@ int msgKick(char *m_in) {
         	sprintf(msg, "You have been kicked from %s by %s (%s)", channel, origin, nick);
 	else
 		sprintf(msg, "You have been kicked from %s by %s (%s)", channel, origin, comment);
-        IRCInterface_RemoveAllNicksChannelThread(channel);
+        //IRCInterface_RemoveAllNicksChannelThread(channel);
     } else {
 	if (comment == NULL)
         	sprintf(msg, "%s has kicked %s from %s (%s)", kicked, nick, channel, kicked);
 	else
 		sprintf(msg, "%s has kicked %s from %s (%s)", kicked, nick, channel, comment);
+	IRCInterface_DeleteNickChannelThread(channel, nick);
 	}
 
     IRCInterface_WriteChannelThread(IRCInterface_ActiveChannelName(), NULL, msg);
@@ -914,7 +915,7 @@ int msgQuit(char *m_in) {
     for (i = 0; i < num; i++)
         IRCInterface_DeleteNickChannelThread(channels[i], origin);
 
-    IRCInterface_FreeListAllChannels(channels, num);
+    IRCInterface_FreeListAllChannelsThread(channels, num);
 
     IRC_MFree(2, &prefix, &comment);
     return 0;
@@ -932,7 +933,7 @@ int msgAway(char *m_in) {
     char msg[512];
 
     sprintf(msg, "You have been marked as being away");
-    IRCInterface_WriteSystem(NULL, msg);
+    IRCInterface_WriteSystemThread(NULL, msg);
 
 
     return 0;
@@ -948,7 +949,7 @@ int msgBack(char *m_in) {
     char msg[512];
 
     sprintf(msg, "You are no longer marked as being away");
-    IRCInterface_WriteSystem(NULL, msg);
+    IRCInterface_WriteSystemThread(NULL, msg);
 
 
     return 0;

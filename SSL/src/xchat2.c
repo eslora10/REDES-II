@@ -1,7 +1,5 @@
-#include "G-2301-04-P2-messages.h"
-#include "G-2301-04-P2-userCommands.h"
-#include "G-2301-04-P3-ssl.h"
-#include "G-2301-04-P3-redes2.h"
+
+#include "../includes/G-2301-04-P3-redes2.h"
 #include <getopt.h>
 
 SSL* ssl_channel = NULL;
@@ -20,6 +18,45 @@ void cambioModeChannel(char* channel, char* mode, char* option) {
     IRCInterface_PlaneRegisterOutMessage(command);
 
     IRC_MFree(1, &command);
+}
+
+/**
+ * Funcion manejada por los hilos que se encarga de recibir y parsear las
+ * respuestas del servidor
+ * @param sck descriptor de fichero del socket en el que se reciben las respuestas
+ * del server
+ * @return NULL en caso de error
+ * @return en caso de correcto funcionamiento el hilo se cierra
+ */
+void* recvInfo(void* sck) {
+    char buffer[MAX_TCP], *pBuffer = NULL, *command = NULL;
+    int retval;
+    long fun;
+
+    while (1) {
+        bzero(buffer, MAX_TCP);
+	retval = recv((*(int*)sck), buffer, MAX_TCP, 0);
+
+        if (retval <= 0) {
+            perror("Error recv");
+            pthread_exit(NULL);
+        }
+        pBuffer = buffer;
+        do {
+            pBuffer = IRC_UnPipelineCommands(pBuffer, &command);
+
+            fun = IRC_CommandQuery(command);
+            /*Imprimimos el mensaje recibido en el registro plano*/
+            IRCInterface_PlaneRegisterInMessageThread(command);
+            if (fun != IRCERR_NOCOMMAND && fun != IRCERR_NOPARAMS && fun != IRCERR_UNKNOWNCOMMAND)
+                Messages[fun](command);
+            IRC_MFree(1, &command);
+        } while (pBuffer);
+
+    }
+
+    pthread_exit(NULL);
+
 }
 
 /**
@@ -952,7 +989,7 @@ void IRCInterface_KickNick(char *channel, char *nick) {
     }
 
     if (sendData(sck, ssl_channel, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return;
     }
 
