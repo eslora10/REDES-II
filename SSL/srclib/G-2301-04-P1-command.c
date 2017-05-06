@@ -1377,6 +1377,12 @@ int partCommand(char* command, char* nick, int sck, SSL *ssl) {
     long retval = 0;
     char *prefix = NULL, *channel = NULL, *msg = NULL, *pChan = NULL, *rply = NULL;
 
+    char *newnick, *away, *user, *real, *host, *IP;
+    long id, creationTS, actionTS;
+    id = actionTS = creationTS = 0;
+    newnick = msg = prefix = rply = away = user = real = host = IP = NULL;
+
+
     retval = IRCParse_Part(command, &prefix, &channel, &msg);
     if (retval != IRC_OK) {
         sendErrMsg(retval, sck, ssl, nick, command);
@@ -1390,8 +1396,17 @@ int partCommand(char* command, char* nick, int sck, SSL *ssl) {
                 sendErrMsg(retval, sck, ssl, nick, pChan);
                 pChan = strtok(NULL, ",");
                 continue;
-            } else
-                IRCMsg_Part(&rply, MY_ADDR, pChan, msg);
+            } else{
+
+                /*Obtenemos lo datos del usuario para crear el complex user*/
+                IRCTADUser_GetData(&id, &user, &newnick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
+                IRC_ComplexUser(&prefix, nick, user, host, MY_ADDR);
+                IRC_MFree(6, &newnick, &user, &real, &host, &IP, &away);
+                id = creationTS = actionTS = 0;
+
+                
+                IRCMsg_Part(&rply, prefix, pChan, msg);
+            }
             sendData(sck, ssl, TCP, NULL, 0, rply, strlen(rply));
             free(rply);
             pChan = strtok(NULL, ",");
