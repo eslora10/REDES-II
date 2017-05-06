@@ -1373,7 +1373,7 @@ int topicCommand(char* command, char* nick, int sck, SSL *ssl) {
  * @return ComplexUser en OK
  * @return NULL en ERROR
  */
-char* complexnick( char *nick){
+char* complexNick( char *nick){
 
     char *away, *user, *real, *host, *IP, *prefix;
     long id, creationTS, actionTS, retval;
@@ -1485,7 +1485,7 @@ int kickCommand(char* command, char* nick, int sck, SSL *ssl) {
         }
 
         /*conseguimos el complexUser*/
-        prefix = complexnick(nick);
+        prefix = complexNick(nick);
         if(!prefix){
             /*el usuario ha sido kickeado con exito pero no se consiguie bien el complexUser*/
             IRCMsg_Kick(&rply, MY_ADDR, channel, user, comment);
