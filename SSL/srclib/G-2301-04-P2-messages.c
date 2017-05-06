@@ -846,7 +846,7 @@ int msgKick(char *m_in) {
         	sprintf(msg, "You have been kicked from %s by %s (%s)", channel, origin, nick);
 	else
 		sprintf(msg, "You have been kicked from %s by %s (%s)", channel, origin, comment);
-        //IRCInterface_RemoveAllNicksChannelThread(channel);
+        IRCInterface_RemoveAllNicksChannelThread(channel);
     } else {
 	if (comment == NULL)
         	sprintf(msg, "%s has kicked %s from %s (%s)", kicked, nick, channel, kicked);
