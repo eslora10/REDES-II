@@ -18,7 +18,7 @@ int main() {
 	fprintf(stderr, "Error abriendo socket\n");
         return -1;
     }
-    if (bindSocket(sck, 6667, 1) < 0) {
+    if (bindSocket(sck, 6667, 1, TCP) < 0) {
         perror("Error en bind");
 	fprintf(stderr, "Error bind\n");
         close(sck);

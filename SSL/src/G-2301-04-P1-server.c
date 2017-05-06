@@ -40,7 +40,7 @@ void* SSLConnections(void *kk){
         perror("Error abriendo socket");
         pthread_exit(NULL);
     }
-    if (bindSocket(sck_ssl, port, 1) < 0) {
+    if (bindSocket(sck_ssl, port, 1, TCP) < 0) {
         perror("Error en bind");
         close(sck_ssl);
         pthread_exit(NULL);
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    if (bindSocket(sck, 6667, 10) < 0) {
+    if (bindSocket(sck, 6667, 10, TCP) < 0) {
         syslog(LOG_ERR, "Error bind");
         return -1;
     }

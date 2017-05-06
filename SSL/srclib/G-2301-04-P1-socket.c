@@ -84,7 +84,7 @@ int openSocket(protocol p) {
  * @return 0 si se realiza todo correctamente,
                   -1 en caso de error
  */
-int bindSocket(int sck, uint16_t port, int max_clients) {
+int bindSocket(int sck, uint16_t port, int max_clients, protocol p) {
 
     struct sockaddr_in addr;
 
@@ -100,9 +100,10 @@ int bindSocket(int sck, uint16_t port, int max_clients) {
     if (bind(sck, (struct sockaddr *) &addr, sizeof (addr)) < 0)
         return -1;
 
-    /*Preparamos el servidor para recibir peticiones de clientes*/
-    if (listen(sck, max_clients) < 0)
-        return -1;
+    if(p == TCP)
+        /*Preparamos el servidor para recibir peticiones de clientes*/
+        if (listen(sck, max_clients) < 0)
+            return -1;
 
     return 0;
 }

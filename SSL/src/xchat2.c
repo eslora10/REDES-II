@@ -1243,6 +1243,49 @@ boolean IRCInterface_SendFile(char *filename, char *nick, char *data, long unsig
  */
 
 boolean IRCInterface_StartAudioChat(char *nick) {
+    char *command = NULL, msg[64];
+    int sckA, port = 0;
+    struct sockaddr_in my_addr;
+    socklen_t slen = sizeof (my_addr);
+
+
+    /*Abrimos un socket en modo UDP*/
+    sckA = openSocket(UDP);
+    if (sckA < 0) {
+        perror("error socket");
+        pthread_exit(NULL);
+    }
+
+    
+    /*Hacemos bind con el puerto 0 para que el SO asigne un puerto aleatorio*/
+    if (bindSocket(sckA, 0, 0, UDP) < 0) {
+        perror("error bind");
+        pthread_exit(NULL);
+    }
+    
+    close(sckA);
+
+    /*Obtenemos el puerto*/
+    getsockname(sckA, (struct sockaddr*) &my_addr, &slen);
+    port = ntohs(my_addr.sin_port);  
+    
+
+    /*Creamos el mensaje PRIVMSG correspondiente*/
+    sprintf(msg, "\001AUDIOCHAT sender %s %d\r\n", "192.168.0.66", port);
+    if (IRCMsg_Privmsg(&command, NULL, nick, msg) != IRC_OK) {
+        IRCInterface_WriteSystem(NULL, "Error al establecer la comunicacion con el servidor");
+        close(sckA);
+        return FALSE;
+    }
+
+    /*Enviamos el comando*/
+    if (sendData(sck, ssl_channel, TCP, NULL, 0, command, strlen(command)) <= 0) {
+        IRCInterface_WriteSystem(NULL, "Error al establecer la comunicacion con el servidor");
+        close(sckA);
+        return FALSE;
+    }
+
+    stopAudio = 0;
     return TRUE;
 }
 
@@ -1282,6 +1325,7 @@ boolean IRCInterface_StartAudioChat(char *nick) {
  */
 
 boolean IRCInterface_StopAudioChat(char *nick) {
+    stopAudio = 1;
     return TRUE;
 }
 
