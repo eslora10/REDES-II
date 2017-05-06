@@ -173,6 +173,7 @@ void* attendClientSocket(void *sck_ssl) {
     free(buffer);
     free(nick);
     close(cl_sck);
+    cerrar_canal_SSL(ssl, NULL);
 
     pthread_exit(NULL);
 }
@@ -680,9 +681,11 @@ long privToUser(char *nickDest, char *dest, char *prefix, char *msg) {
     /*no se liberan los argumentos de la funcion*/
     long retval = 0, id = 0, creationTS = 0, actionTS = 0;
     char *user, *real, *host, *IP, *away;
-    user = real = host = IP = away = NULL;
     int sckDest = 0;
     char *rplPrivmsg = NULL;
+    /*variable que controla si el usiario destino esta away*/
+    int r = 0;
+    user = real = host = IP = away = NULL;
 
     /*caso usuario*/
     if (!dest)
@@ -706,8 +709,7 @@ long privToUser(char *nickDest, char *dest, char *prefix, char *msg) {
     /*enviamos el mensaje al user destino*/
     sendData(sckDest, NULL, TCP, NULL, 0, rplPrivmsg, strlen(rplPrivmsg));
 
-    /*variable que controla si el usiario destino esta away*/
-    int r = 0;
+    
     if (away) r = 1;
     IRC_MFree(6, &rplPrivmsg,
             &user, &real, &host, &IP, &away);
@@ -724,12 +726,13 @@ long privToUser(char *nickDest, char *dest, char *prefix, char *msg) {
 int privmsgCommand(char* command, char * nick, int sck, SSL *ssl) {
     long retval = 0, num = 0, i = 0;
     char *prefix, *msgtarget, *msg, **users;
-    prefix = msgtarget = msg = NULL;
-    users = NULL;
     char *rplAway = NULL;
 
     long id = 0, creationTS = 0, actionTS = 0;
     char *user, *real, *host, *IP, *away;
+
+    prefix = msgtarget = msg = NULL;
+    users = NULL;
     user = real = host = IP = away = NULL;
 
     retval = IRCParse_Privmsg(command, &prefix, &msgtarget, &msg);
@@ -1032,7 +1035,7 @@ int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
     char *user = NULL, *real = NULL, *host = NULL, *IP = NULL;
     char *away = NULL;
     char *rplWho = NULL, *rplEnd = NULL;
-    int sck2 = 0;
+    int sck2 = 0, i;
     long id = 0, retval = 0, actionTS = 0, creationTS = 0 ,num = 0;
 
     char *mask =NULL, *oppar=NULL;
@@ -1089,7 +1092,7 @@ int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
     }
 
     /*iteramos en los usuarios del canal*/
-    for (int i = 0; i < num; i++) {
+    for (i = 0; i < num; i++) {
 
         retval = IRCTADUser_GetData(&id, &user, &nicks[i], &real, &host, &IP, &sck2,
                 &creationTS, &actionTS, &away);

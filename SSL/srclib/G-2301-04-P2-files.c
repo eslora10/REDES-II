@@ -23,8 +23,8 @@ void* fileReceiver(void *args) {
     bzero(buffer, MAX_TCP);
     len = 0;
     remain_data = (*(struct fileReceiver_args *) args).length;
-    while (((len = recv((*(struct fileReceiver_args *) args).sckF,
-            buffer, MAX_TCP, 0)) > 0) && (remain_data > 0)) {
+    while (((len = receiveData((*(struct fileReceiver_args *) args).sckF, NULL, 
+            TCP, NULL, 0, buffer, MAX_TCP)) > 0) && (remain_data > 0)) {
         fwrite(buffer, sizeof (char), len, fd);
         remain_data -= len;
         bzero(buffer, MAX_TCP);
@@ -104,8 +104,9 @@ void* fileSender(void *fs) {
         nbytes = (*(struct fileSender_args*) fs).length;
         /*El receptor ha aceptado el envio, enviamos el fichero*/
         cl_sck = acceptSocket(s);
-        while ((sent = send(cl_sck, (*(struct fileSender_args*) fs).data + offset,
-                nbytes, 0)) > 0 || (sent == -1 && errno == EINTR)) {
+        while ((sent = sendData(cl_sck, NULL, TCP, NULL, 0,
+                (*(struct fileSender_args*) fs).data + offset,
+                nbytes)) > 0 || (sent == -1 && errno == EINTR)) {
             if (sent > 0) {
                 offset += sent;
                 nbytes -= sent;
@@ -122,45 +123,6 @@ void* fileSender(void *fs) {
     close(cl_sck);
     close((*(struct fileSender_args*) fs).sck);
     pthread_exit(NULL);
-}
-
-/**
- * Funcion manejada por los hilos que se encarga de recibir y parsear las
- * respuestas del servidor
- * @param sck descriptor de fichero del socket en el que se reciben las respuestas
- * del server
- * @return NULL en caso de error
- * @return en caso de correcto funcionamiento el hilo se cierra
- */
-void* recvInfo(void* sck) {
-    char buffer[MAX_TCP], *pBuffer = NULL, *command = NULL;
-    int retval;
-    long fun;
-
-    while (1) {
-        bzero(buffer, MAX_TCP);
-	retval = recv((*(int*)sck), buffer, MAX_TCP, 0);
-
-        if (retval <= 0) {
-            perror("Error recv");
-            pthread_exit(NULL);
-        }
-        pBuffer = buffer;
-        do {
-            pBuffer = IRC_UnPipelineCommands(pBuffer, &command);
-
-            fun = IRC_CommandQuery(command);
-            /*Imprimimos el mensaje recibido en el registro plano*/
-            IRCInterface_PlaneRegisterInMessage(command);
-            if (fun != IRCERR_NOCOMMAND && fun != IRCERR_NOPARAMS && fun != IRCERR_UNKNOWNCOMMAND)
-                Messages[fun](command);
-            IRC_MFree(1, &command);
-        } while (pBuffer);
-
-    }
-
-    pthread_exit(NULL);
-
 }
 
 

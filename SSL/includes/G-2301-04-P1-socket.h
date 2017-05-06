@@ -90,15 +90,14 @@ int connectClientSocket(int sck, char* host_name, int port);
  * @param sck identificador de fichero con el socket
  * @param ssl puntero a una estructura ssl. Si vale NULL se asume canal no seguro
  * @param p protocolo TCP o UDP (se asume TCP por defecto)
- * @param sockaddr puntero a una estructura con el host destino. Solo necesaria para UDP
- * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
+ * @param dest_addrUDP nombre del host al que vamos a enviar en UDP
+ * @param portUDP puerto al que enviamos los datos en UDP, debe coincidir con el del socket
  * @param data datos que se envian
  * @param longitud de los datos que se envian
  * @return numero de bytes leidos si todo correcto
  * @return -1 en caso de error
  */
-int sendData(int sck, SSL *ssl, protocol p, const struct sockaddr *dest_addr, socklen_t addrlen, 
-                char *data, int len);
+int sendData(int sck, SSL *ssl, protocol p, char *dest_addrUDP, int portUDP, char *data, int len);
 
 
 /**
@@ -107,15 +106,13 @@ int sendData(int sck, SSL *ssl, protocol p, const struct sockaddr *dest_addr, so
  * @param sck identificador de fichero con el socket
  * @param ssl puntero a una estructura ssl. Si vale NULL se asume canal no seguro
  * @param p protocolo TCP o UDP (se asume TCP por defecto)
- * @param sockaddr puntero a una estructura con el host destino. Solo necesaria para UDP
- * @param addrlen longitud de la estructura del host destino. Solo necesario para UDP
+ * @param dest_addrUDP nombre del host al que vamos a enviar en UDP
+ * @param portUDP puerto al que enviamos los datos en UDP, debe coincidir con el del socket
  * @param data datos que se envian
  * @param longitud de los datos que se envian
- * @return numero de bytes enviados si todo correcto
+ * @return numero de bytes leidos si todo correcto
  * @return -1 en caso de error
  */
-int receiveData(int sck, SSL *ssl, protocol p, struct sockaddr *dest_addr, socklen_t addrlen, 
-                char *data, int len);
-
+int receiveData(int sck, SSL *ssl, protocol p, char *dest_addrUDP, int portUDP, char *data, int len);
 
 #endif /*SOCKET_H*/

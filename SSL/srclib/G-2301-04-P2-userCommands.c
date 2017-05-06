@@ -97,7 +97,7 @@ int userCommandJoin(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
     IRCInterface_PlaneRegisterOutMessage(msgServer);
@@ -116,7 +116,6 @@ int userCommandJoin(char *command, SSL *ssl) {
 int userCommandNick(char *command, SSL *ssl) {
     char *newnick, *msgServer;
     newnick = msgServer = NULL;
-
     /*Parseamos el comando de usuario*/
     if (IRCUserParse_Nick(command, &newnick) != IRC_OK) {
         IRCInterface_WriteSystem(NULL, "/nick <newnick>, cambia el nick");
@@ -130,7 +129,7 @@ int userCommandNick(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
     IRCInterface_PlaneRegisterOutMessage(msgServer);
@@ -287,7 +286,7 @@ int userCommandKick(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
 
@@ -318,7 +317,7 @@ int userCommandPart(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
     IRCInterface_PlaneRegisterOutMessage(msgServer);
@@ -368,7 +367,7 @@ int userCommandQuit(char *command, SSL *ssl) {
     IRCInterface_FreeListAllChannels(channels, num);
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
 
@@ -399,7 +398,7 @@ int userCommandAway(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
 
@@ -425,7 +424,7 @@ int userCommandBack(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
 
@@ -456,7 +455,7 @@ int userCommandTopic(char *command, SSL *ssl) {
     }
 
     if (sendData(sck, ssl, TCP, NULL, 0, msgServer, strlen(msgServer)) <= 0) {
-        IRCInterface_WriteSystemThread(NULL, "Error al conectar con el servidor");
+        IRCInterface_WriteSystem(NULL, "Error al conectar con el servidor");
         return -1;
     }
 
