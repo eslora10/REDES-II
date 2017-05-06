@@ -23,8 +23,8 @@ void* fileReceiver(void *args) {
     bzero(buffer, MAX_TCP);
     len = 0;
     remain_data = (*(struct fileReceiver_args *) args).length;
-    while (((len = recv((*(struct fileReceiver_args *) args).sckF,
-            buffer, MAX_TCP, 0)) > 0) && (remain_data > 0)) {
+    while (((len = receiveData((*(struct fileReceiver_args *) args).sckF, NULL, 
+            TCP, NULL, 0, buffer, MAX_TCP)) > 0) && (remain_data > 0)) {
         fwrite(buffer, sizeof (char), len, fd);
         remain_data -= len;
         bzero(buffer, MAX_TCP);
@@ -104,8 +104,9 @@ void* fileSender(void *fs) {
         nbytes = (*(struct fileSender_args*) fs).length;
         /*El receptor ha aceptado el envio, enviamos el fichero*/
         cl_sck = acceptSocket(s);
-        while ((sent = send(cl_sck, (*(struct fileSender_args*) fs).data + offset,
-                nbytes, 0)) > 0 || (sent == -1 && errno == EINTR)) {
+        while ((sent = sendData(cl_sck, NULL, TCP, NULL, 0,
+                (*(struct fileSender_args*) fs).data + offset,
+                nbytes)) > 0 || (sent == -1 && errno == EINTR)) {
             if (sent > 0) {
                 offset += sent;
                 nbytes -= sent;
