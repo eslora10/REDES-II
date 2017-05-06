@@ -118,6 +118,15 @@ int main(int argc, char** argv) {
     pthread_t thread, ssl_thread;
     Sck_SSL *argAttend = NULL;
 
+    static struct option options[] = {
+		{"port", required_argument, 0,'1'},
+        {"ssl", no_argument, 0, '2'},
+        {"s", no_argument, 0, '3'},
+        {"help", no_argument, 0, '4'},
+        {"h", no_argument, 0, '5'},
+        {0, 0, 0, 0}
+    };
+
 
     for (i = 0; i < 37; i++)
         Commands[i] = FuncDefault;
@@ -138,14 +147,7 @@ int main(int argc, char** argv) {
     Commands[34] = pingCommand;
     Commands[37] = awayCommand;
 
-    static struct option options[] = {
-		{"port", required_argument, 0,'1'},
-        {"ssl", no_argument, 0, '2'},
-        {"s", no_argument, 0, '3'},
-        {"help", no_argument, 0, '4'},
-        {"h", no_argument, 0, '5'},
-        {0, 0, 0, 0}
-    };
+
 
     while ((opt = getopt_long_only(argc, argv, "1:2:3:4:5:6", options, &long_index)) != -1) {
         switch (opt) {
