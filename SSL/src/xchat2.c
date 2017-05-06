@@ -1434,11 +1434,10 @@ int main(int argc, char *argv[]) {
     int i, port = 6669;
     int long_index;
     SSL_CTX *ctx;
-    char opt;
-
+    char opt, command[MAXLEN] = {""};
     static struct option options[] = {
-        {"port", required_argument, 0, '2'},
-	{"ssldata", required_argument, 0,'1'},
+        {"port", required_argument, 0, '1'},
+	{"ssldata", required_argument, 0,'2'},
         {0, 0, 0, 0}
     };
 
@@ -1498,47 +1497,53 @@ int main(int argc, char *argv[]) {
 
     if(argc == 1)
         IRCInterface_Run(argc, argv);
-        
 
     while ((opt = getopt_long_only(argc, argv, "1:2:?", options, &long_index)) != -1) {
         switch (opt) {
             case '1':
                 port = atoi(optarg);
             case '2':
-		        /*Inicio capa ssl*/
-		        ctx = inicializar_nivel_SSL("certs/ca.pem", "certs/cliente.pem");
-		        if(!ctx){
-		            fprintf(stderr, "Los certificados del cliente no son correctos\n");
-		            return -1;
-		        }
-		        sck = openSocket(TCP);
-		        if (sck < 0){
-		            perror("Error abriendo socket");
-		            fprintf(stderr, "Error abriendo socket\n");
-		            return -1;
-		        }
-		
-		        if(connectClientSocket(sck, "localhost", port) < 0){
-		            fprintf(stderr, "Error connect\n");
-		            perror("Error connect");
-		            close(sck);
-		            return -1;
-		        }
-		
-		        ssl_channel = conectar_canal_seguro_SSL(ctx, sck);
-		        if(!ssl_channel){
-		            perror("Error en el handshake inicial");
-		            close(sck);
-		            return -1;
-		        }  
-		        if(evaluar_post_connectar_SSL(ssl_channel) < 0){
-		            fprintf(stderr, "El servidor no ha enviado ningun certificado o no es verificado por la CA\n");
-		            close(sck);
-		            return -1;
-		        }
-		        enviar_datos_SSL(ssl_channel, optarg, strlen(optarg));
-		        cerrar_canal_SSL(ssl_channel,ctx);
-		        break;
+                /*Inicio capa ssl*/
+                ctx = inicializar_nivel_SSL("certs/ca.pem", "certs/cliente.pem");
+                if(!ctx){
+                    fprintf(stderr, "Los certificados del cliente no son correctos\n");
+                    return -1;
+                }
+                sck = openSocket(TCP);
+                if (sck < 0){
+                    perror("Error abriendo socket");
+                    fprintf(stderr, "Error abriendo socket\n");
+                    return -1;
+                }
+
+                if(connectClientSocket(sck, "localhost", port) < 0){
+                    fprintf(stderr, "Error connect\n");
+                    perror("Error connect");
+                    close(sck);
+                    return -1;
+                }
+
+                ssl_channel = conectar_canal_seguro_SSL(ctx, sck);
+                if(!ssl_channel){
+                    fprintf(stderr, "Error en el handshake inicial\n");
+                    close(sck);
+                    return -1;
+                }  
+                if(evaluar_post_connectar_SSL(ssl_channel) < 0){
+                    fprintf(stderr, "El servidor no ha enviado ningun certificado o no es verificado por la CA\n");
+                    close(sck);
+                    return -1;
+                }
+                optind--;
+                for( ;optind < argc && *argv[optind] != '-'; optind++){
+                     strcat(command, argv[optind]);   
+                     strcat(command, " ");      
+                }
+                   
+                strcat(command, "\r\n");  
+                enviar_datos_SSL(ssl_channel, command, strlen(command));
+                cerrar_canal_SSL(ssl_channel,ctx);
+                break;
 		
             case '?':
             default:
@@ -1547,6 +1552,7 @@ int main(int argc, char *argv[]) {
                 printf("--ssldata\tEnvía a localhost la cadena especificada cifrada con ssl. Si no se especifica el puerto supone 6669\n");
                 break;
         }
+        i++;
     }
 
 

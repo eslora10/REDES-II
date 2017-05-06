@@ -131,6 +131,10 @@ void* attendClientSocket(void *sck_ssl) {
     char  *nick = NULL;
     SSL *ssl;
 
+
+
+        syslog(LOG_ERR, "Hilo creado");
+
     cl_sck = ((Sck_SSL*)sck_ssl)->sck;
     ssl = ((Sck_SSL*)sck_ssl)->ssl;
 

@@ -1,6 +1,5 @@
 CC = gcc
 CFLAGS = -pedantic -Wall -pthread `pkg-config --cflags gtk+-3.0` -I $(IDIR)
-LIBS = -lssl -lcrypto -lircredes -lircinterface -lirctad -lsoundredes -lpthread -rdynamic -lpulse -lpulse-simple `pkg-config --libs gtk+-3.0`
 
 #directorios
 IDIR=includes
@@ -9,6 +8,9 @@ LDIR=lib
 SDIR=src
 SLDIR=srclib
 OLDIR=objlib
+
+
+LIBS = -L$(LDIR) -lredes2 -lssl -lcrypto -lpthread -lircinterface -lircredes -lirctad -lsoundredes -rdynamic `pkg-config --libs gtk+-3.0` -lpulse -lpulse-simple
 
 #rutas de los ficheros
 _DEPS = G-2301-04-P1-socket.h G-2301-04-P3-ssl.h G-2301-04-P3-redes2.h G-2301-04-P1-command.h G-2301-04-P2-userCommands.h G-2301-04-P2-messages.h G-2301-04-P2-files.h G-2301-04-P2-audio.h
@@ -60,16 +62,16 @@ $(LDIR)/libredes2.a: $(OBJL)
 	ar rcs $@ $^
 
 cliente_servidor/cliente_IRC: $(LDIR)/libredes2.a src/xchat2.c
-	$(CC) -o $@ src/xchat2.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+	$(CC) -o $@ src/xchat2.c $(CFLAGS) $(LIBS)
 
 cliente_servidor/servidor_IRC: $(LDIR)/libredes2.a src/G-2301-04-P1-server.c
-	$(CC) -o $@ src/G-2301-04-P1-server.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+	$(CC) -o $@ src/G-2301-04-P1-server.c $(CFLAGS) $(LIBS)
 
 echo/servidor_echo: $(LDIR)/libredes2.a src/servidor_echo.c
-	$(CC) -o $@ src/servidor_echo.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+	$(CC) -o $@ src/servidor_echo.c $(CFLAGS) $(LIBS)
 
 echo/cliente_echo: $(LDIR)/libredes2.a src/cliente_echo.c
-	$(CC) -o $@ src/cliente_echo.c -L$(LDIR) -lredes2 $(CFLAGS) $(LIBS)
+	$(CC) -o $@ src/cliente_echo.c $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 clean:
