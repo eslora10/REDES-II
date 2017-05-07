@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc -g
 CFLAGS = -pedantic -Wall -pthread `pkg-config --cflags gtk+-3.0` -I $(IDIR)
 
 #directorios

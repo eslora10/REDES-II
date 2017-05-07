@@ -1,14 +1,46 @@
 /**
-* Modulo de comandos. Implementa todos los comandos IRC requeridos por
-* el corrector
-* @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
-* @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
-* @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
-* @file G-2301-04-P1-command.c
-*/
+ * Modulo de comandos. Implementa todos los comandos IRC requeridos por
+ * el corrector
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P1-command.c
+ */
 
 #include "../includes/G-2301-04-P3-redes2.h"
 
+/**
+ * @brief Funcion Auxiliar COMPLEXNICK
+ *  Consigue el complexUser a partir del nick proporcionado
+ *  El complexUser devuelto debe ser liberado por el programador
+ * @param nick nick de quien se pretende sacar el complexUser
+ * @return ComplexUser en OK
+ * @return NULL en ERROR
+ */
+char* complexNick(char *nick) {
+
+    char *away, *user, *real, *host, *IP, *prefix;
+    long id, creationTS, actionTS, retval;
+    int sck;
+    retval = id = actionTS = creationTS = 0;
+    prefix = away = user = real = host = IP = NULL;
+
+    /*Conseguimos los datos mediante el nick proporcionado*/
+    retval = IRCTADUser_GetData(&id, &user, &nick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
+    if (retval != IRC_OK)
+        return NULL;
+
+    /*Contruimos el COMPLEXUSER*/
+    retval = IRC_ComplexUser(&prefix, nick, user, host, MY_ADDR);
+
+    /*liberamos los necesario*/
+    IRC_MFree(5, &user, &real, &host, &IP, &away);
+    id = creationTS = actionTS = 0;
+
+    if (retval != IRC_OK)
+        return NULL;
+    return prefix;
+}
 
 /**
  * @brief Inicia la conexion con el cliente. Espera los comandos
@@ -19,7 +51,7 @@
  * nuevo usuario
  * @return 0 si todo ha ido bien, -1 en caso de error
  */
-int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
+int beginConnection(int cl_sck, SSL* ssl, char** pBuffer, char** nick) {
 
     char *prefix = NULL, *command = NULL;
     char *nickname = NULL, *username = NULL, *hostname = NULL, *servername = NULL, *realname = NULL, *pass = NULL;
@@ -27,7 +59,7 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
     char buffer[MAXLEN];
     long retval, numCommand;
     struct sockaddr_in cl_addr;
-    socklen_t len = sizeof(cl_addr);
+    socklen_t len = sizeof (cl_addr);
     char *cl_addName;
     /*Flags control*/
     int nickDone = 0, welcome = 0;
@@ -43,7 +75,7 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
             *pBuffer = IRC_UnPipelineCommands(*pBuffer, &command);
             numCommand = IRC_CommandQuery(command);
             switch (numCommand) {
-                /*PASS*/
+                    /*PASS*/
                 case 1:
                     /*La password se devuelve por pass*/
                     retval = IRCParse_Pass(command, &prefix, &pass);
@@ -51,20 +83,21 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
                     /*control errores*/
                     break;
 
-                /*NICK*/
+                    /*NICK*/
                 case 2:
                     /*El nick se devuelve por nick*/
                     retval = IRCParse_Nick(command, &prefix, &nickname, &msg);
                     nickDone = 1;
                     /*control errores*/
-                    if (retval!= IRC_OK) {
+                    if (retval != IRC_OK) {
                         sendErrMsg(retval, cl_sck, ssl, "*", "*");
                         nickDone = 0;
                     }
-                    if(strlen(nickname)>MAX_NICK){
-                        sendErrMsg(IRCERR_INVALIDNICK,cl_sck, ssl, "*","*");
-                        nickDone= 0;
-                        free(nickname);nickname=NULL;
+                    if (strlen(nickname) > MAX_NICK) {
+                        sendErrMsg(IRCERR_INVALIDNICK, cl_sck, ssl, "*", "*");
+                        nickDone = 0;
+                        free(nickname);
+                        nickname = NULL;
                     }
                     break;
 
@@ -74,14 +107,14 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
                     /*Parseamos los datos del comando User*/
                     retval = IRCParse_User(command, &prefix, &username, &hostname, &servername, &realname);
                     /*control errores*/
-                    if (retval!=IRC_OK) {
+                    if (retval != IRC_OK) {
                         sendErrMsg(retval, cl_sck, ssl, "*", command);
-                        IRC_MFree(1,&nickname);
+                        IRC_MFree(1, &nickname);
                         return ERROR;
                     }
 
                     /*Obtenemos el nombre de servidor del cliente*/
-                    getpeername(cl_sck, (struct sockaddr *)&cl_addr, &len);
+                    getpeername(cl_sck, (struct sockaddr *) &cl_addr, &len);
                     cl_addName = inet_ntoa(cl_addr.sin_addr);
                     /*Creamos el usuario*/
                     retval = IRCTADUser_New(username, nickname, realname, pass, cl_addName, MY_ADDR, cl_sck);
@@ -92,7 +125,7 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
                     } else if (retval == IRCERR_INVALIDIP) {
                         sendErrMsg(retval, cl_sck, ssl, "*", nickname);
                     } else if (retval != IRC_OK) {
-                        sendErrMsg(retval,cl_sck, ssl,"*",command);
+                        sendErrMsg(retval, cl_sck, ssl, "*", command);
                     }
                     break;
 
@@ -109,8 +142,8 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
     IRCMsg_RplWelcome(&command, MY_ADDR, nickname, nickname, username, cl_addName);
     if (sendData(cl_sck, ssl, TCP, NULL, 0, command, strlen(command)) < 0)
         perror("Error");
-    *nick = (char*)malloc((MAX_NICK+1)*sizeof(char));
-    if(*nick == NULL)
+    *nick = (char*) malloc((MAX_NICK + 1) * sizeof (char));
+    if (*nick == NULL)
         return -1;
     strcpy(*nick, nickname);
     IRC_MFree(7, &prefix, &command, &nickname, &username, &hostname, &servername,
@@ -128,18 +161,15 @@ void* attendClientSocket(void *sck_ssl) {
     long fun = 0;
     char *buffer = NULL;
     char * pBuffer, *command = NULL;
-    char  *nick = NULL;
+    char *nick = NULL;
     SSL *ssl;
 
 
+    cl_sck = ((Sck_SSL*) sck_ssl)->sck;
+    ssl = ((Sck_SSL*) sck_ssl)->ssl;
 
-        syslog(LOG_ERR, "Hilo creado");
-
-    cl_sck = ((Sck_SSL*)sck_ssl)->sck;
-    ssl = ((Sck_SSL*)sck_ssl)->ssl;
-
-    do{
-    } while(beginConnection(cl_sck, ssl, &buffer, &nick) == -1);
+    do {
+    } while (beginConnection(cl_sck, ssl, &buffer, &nick) == -1);
 
     if (!buffer) {
         buffer = (char*) malloc(MAXLEN * sizeof (char));
@@ -150,10 +180,12 @@ void* attendClientSocket(void *sck_ssl) {
 
         if (receiveData(cl_sck, ssl, TCP, NULL, 0, buffer, MAXLEN) <= 0) {
             /*Se ha producido un error o el cliente ha cerrado la conexion*/
-            IRCTAD_Quit (nick);
+            syslog(LOG_INFO, "A client has disconnected");
+            IRCTAD_Quit(nick);
             free(nick);
             free(buffer);
             close(cl_sck);
+            cerrar_canal_SSL(ssl, NULL);
             pthread_exit(NULL);
         }
         pBuffer = buffer;
@@ -168,7 +200,7 @@ void* attendClientSocket(void *sck_ssl) {
                 ret = Commands[fun](command, nick, cl_sck, ssl);
             }
             /*Actualizamos el timestamp de la ultima accion del usuario*/
-            IRCTADUser_SetActionTS (0, NULL, nick, NULL);
+            IRCTADUser_SetActionTS(0, NULL, nick, NULL);
             free(command);
 
         } while (pBuffer);
@@ -183,14 +215,14 @@ void* attendClientSocket(void *sck_ssl) {
 }
 
 /**
-* @brief Funcion de parseo de errores IRC. Coge el codigo de error y envia su
-* mensaje correspondiente
-* @param errval Codigo de error IRC
-* @param sck descriptor de fichero del socket en el que se envia el error
-* @param nick nickname del usuario
-* @param param parametros adicionales para el mensaje de error
-* @return 0 OK, -1 ERROR
-*/
+ * @brief Funcion de parseo de errores IRC. Coge el codigo de error y envia su
+ * mensaje correspondiente
+ * @param errval Codigo de error IRC
+ * @param sck descriptor de fichero del socket en el que se envia el error
+ * @param nick nickname del usuario
+ * @param param parametros adicionales para el mensaje de error
+ * @return 0 OK, -1 ERROR
+ */
 int sendErrMsg(long errval, int sck, SSL *ssl, char *nick, char *param) {
     char *errmsg = NULL;
     switch (errval) {
@@ -263,7 +295,7 @@ int sendErrMsg(long errval, int sck, SSL *ssl, char *nick, char *param) {
             IRCMsg_ErrBadChannelKey(&errmsg, MY_ADDR, nick, param);
             break;
         case IRCERR_INVALIDIP:
-            IRCMsg_ErrAlreadyRegistred (&errmsg, MY_ADDR, param);
+            IRCMsg_ErrAlreadyRegistred(&errmsg, MY_ADDR, param);
         default:
             IRCMsg_ErrNeedMoreParams(&errmsg, MY_ADDR, nick, param);
             break;
@@ -359,7 +391,7 @@ int nickCommand(char* command, char* nick, int sck, SSL *ssl) {
     }
     retval = IRC_ComplexUser(&prefix, nick, user, host, MY_ADDR);
     strcpy(nick, newnick);
-    IRCMsg_Nick(&rply, MY_ADDR, NULL, newnick);
+    IRCMsg_Nick(&rply, prefix, NULL, newnick);
     sendData(sck, ssl, TCP, NULL, 0, rply, strlen(rply));
     IRC_MFree(8, &rply, &user, &real, &host, &IP, &away, &prefix, &newnick);
 
@@ -399,7 +431,11 @@ int modeCommand(char* command, char* nick, int sck, SSL *ssl) {
             IRC_MFree(3, &channel, &prefix, &pass);
             return -1;
         }
-        retval = IRCMsg_RplChannelModeIs(&rplM, MY_ADDR, nick, channel, mode);
+        if (!strcmp(mode, ""))
+            retval = IRCMsg_RplChannelModeIs(&rplM, MY_ADDR, nick, channel, "+");
+        else
+            retval = IRCMsg_RplChannelModeIs(&rplM, MY_ADDR, nick, channel, mode);
+
         if (retval != IRC_OK) {
             sendErrMsg(retval, sck, ssl, nick, channel);
             IRC_MFree(5, &rplM, &channel, &prefix, &pass, &mode);
@@ -460,8 +496,13 @@ int modeCommand(char* command, char* nick, int sck, SSL *ssl) {
  * @return -1 en caso de fallo, 0 OK
  */
 int quitCommand(char* command, char* nick, int sck, SSL *ssl) {
-    long retval;
+    long retval, nelements, i, id = 0, actionTS, creationTS;
+    int socket = 0;
     char *msg = NULL, *errmsg = NULL, *prefix = NULL, *notice = NULL;
+    char *user, *real, *host, *IP, *away, *msgQ;
+    char **nicklist = NULL;
+
+    user = real = host = IP = away = msgQ = NULL;
 
     /*Parseo del comando*/
     retval = IRCParse_Quit(command, &prefix, &msg);
@@ -472,13 +513,38 @@ int quitCommand(char* command, char* nick, int sck, SSL *ssl) {
         return -1;
     }
 
+    IRC_MFree(1, &prefix);
+    prefix = complexNick(nick);
+
     /*Eliminamos al usuario*/
     IRCTAD_Quit(nick);
     IRCMsg_Notice(&notice, MY_ADDR, nick, "Leaving server...");
     sendData(sck, ssl, TCP, NULL, 0, notice, strlen(notice));
 
+    /*Enviamos el mensaje a todos los usuarios del servidor*/
+    if (IRCTADUser_GetNickList(&nicklist, &nelements) != IRC_OK) {
+        IRC_MFree(3, &notice, &prefix, &msg);
+        return -1;
+    }
 
-    IRC_MFree(3, &notice, &prefix, &msg);
+
+    if (!msg)
+        IRCMsg_Quit(&msgQ, prefix, "Leaving");
+    else
+        IRCMsg_Quit(&msgQ, prefix, msg);
+
+    for (i = 0; i < nelements; i++) {
+        IRCTADUser_GetData(&id, &user, &nicklist[i], &real, &host, &IP,
+                &socket, &creationTS, &actionTS, &away);
+        sendData(socket, NULL, TCP, NULL, 0, msgQ, strlen(msgQ));
+        IRC_MFree(6, &user, &nicklist[i], &real, &host, &IP, &away);
+        id = socket = 0;
+
+    }
+    free(nicklist);
+
+
+    IRC_MFree(4, &notice, &prefix, &msg, &msgQ);
 
     return END_CONNECTION;
 }
@@ -504,7 +570,11 @@ int getNamesMsg(char **rplN, char **rplNE, char *chan, char *nick) {
         IRCMsg_RplEndOfNames(rplNE, MY_ADDR, nick, chan);
     } else {
         type = IRCTADChan_GetModeChar(chan);
-        IRCMsg_RplNamReply(rplN, MY_ADDR, nick,
+        if (!strcmp(type, ""))
+            IRCMsg_RplNamReply(rplN, MY_ADDR, nick,
+                "=", chan, lNicks);
+        else
+            IRCMsg_RplNamReply(rplN, MY_ADDR, nick,
                 type, chan, lNicks);
         IRCMsg_RplEndOfNames(rplNE, MY_ADDR, nick, chan);
     }
@@ -582,7 +652,7 @@ int namesCommand(char* command, char* nick, int sck, SSL *ssl) {
  * @param nick nick del usuario que ejecuta el comando
  * @return 0 OK, -1 ERR
  */
-int getListMsg(char **msgL, char **errmsg, char *chan, char *nick){
+int getListMsg(char **msgL, char **errmsg, char *chan, char *nick) {
     long retval, mode;
     char *topic = NULL, numUsers[sizeof (long)];
     retval = mode = 0;
@@ -595,13 +665,13 @@ int getListMsg(char **msgL, char **errmsg, char *chan, char *nick){
     /*Cogemos el modo del canal para ver que no es secreto*/
     mode = IRCTADChan_GetModeInt(chan);
     if (((mode & IRCMODE_SECRET) == IRCMODE_SECRET) &&
-        IRCTAD_TestUserOnChannel(chan, nick) != IRC_OK) {
+            IRCTAD_TestUserOnChannel(chan, nick) != IRC_OK) {
         /*El canal es secretoy el usuario no esta en el canal*/
         IRC_MFree(1, &topic);
         return -1;
     }
     sprintf(numUsers, "%ld", IRCTADChan_GetNumberOfUsers(chan));
-    if(!topic)
+    if (!topic)
         IRCMsg_RplList(msgL, MY_ADDR, nick, chan, numUsers, "");
     else
         IRCMsg_RplList(msgL, MY_ADDR, nick, chan, numUsers, topic);
@@ -649,18 +719,18 @@ int listCommand(char* command, char* nick, int sck, SSL *ssl) {
         pChan = strtok(channel, ",");
         while (pChan) {
             getListMsg(&msgL, &errmsg, pChan, nick);
-            if(errmsg)
+            if (errmsg)
                 sendData(sck, ssl, TCP, NULL, 0, errmsg, strlen(errmsg));
             else if (msgL)
                 sendData(sck, ssl, TCP, NULL, 0, msgL, strlen(msgL));
             IRC_MFree(2, &errmsg, &msgL);
             pChan = strtok(NULL, ",");
         }
-    }else {
+    } else {
         IRCTADChan_GetList(&listChan, &numChan, NULL);
         for (i = 0; i < numChan; i++) {
             getListMsg(&msgL, &errmsg, listChan[i], nick);
-            if(errmsg)
+            if (errmsg)
                 sendData(sck, ssl, TCP, NULL, 0, errmsg, strlen(errmsg));
             else if (msgL)
                 sendData(sck, ssl, TCP, NULL, 0, msgL, strlen(msgL));
@@ -713,7 +783,7 @@ long privToUser(char *nickDest, char *dest, char *prefix, char *msg) {
     /*enviamos el mensaje al user destino*/
     sendData(sckDest, NULL, TCP, NULL, 0, rplPrivmsg, strlen(rplPrivmsg));
 
-    
+
     if (away) r = 1;
     IRC_MFree(6, &rplPrivmsg,
             &user, &real, &host, &IP, &away);
@@ -780,6 +850,9 @@ int privmsgCommand(char* command, char * nick, int sck, SSL *ssl) {
         }
         for (i = 0; i < num; i++) {
             /*ponemos como destino el canal*/
+            if (!strcmp(nick, users[i]))
+                /*Si el usuario del canal somos nosotros no mandamos ningun mensaje*/
+                continue;
             retval = privToUser(users[i], msgtarget, prefix, msg);
             if (retval == 1) {
                 int sck2 = 0;
@@ -900,11 +973,12 @@ int motdCommand(char* command, char* nick, int sck, SSL *ssl) {
  * @return -1 en caso de fallo, 0 OK
  */
 int joinCommand(char* command, char* nick, int sck, SSL *ssl) {
-    long retval = 0, actionTS = 0, creationTS = 0, id = 0, nNicks = 0;
+    long retval = 0, actionTS = 0, creationTS = 0, id = 0, nNicks = 0, i = 0;
     char *prefix, *channel, *key, *msg, *user, *real, *host, *IP, *away, *pChan,
-            *rplJ, *rplT, *rplN, *topic, *type, *lNicks;
-    lNicks = type = topic = rplJ = rplT = rplN = pChan = user = real = host =
-            IP = away = prefix = channel = key = msg = NULL;
+            *rplJ, *rplT, *rplN, *rplNE, *topic, *type, **lNicks = NULL;
+    int sckN;
+    type = topic = rplJ = rplT = rplN = pChan = user = real = host =
+            IP = away = prefix = channel = key = msg = rplNE = NULL;
 
     /*Parseo del comando*/
     retval = IRCParse_Join(command, &prefix, &channel, &key, &msg);
@@ -929,6 +1003,7 @@ int joinCommand(char* command, char* nick, int sck, SSL *ssl) {
     }
     retval = IRC_ComplexUser(&prefix, nick, user, host, MY_ADDR);
 
+    IRC_MFree(5, &user, &real, &host, &IP, &away);
     /*Join puede aceptar una lista de canales, por tanto seperamos los canales*/
     pChan = strtok(channel, ",");
     while (pChan != NULL) {
@@ -948,6 +1023,25 @@ int joinCommand(char* command, char* nick, int sck, SSL *ssl) {
         /*Creamos el mensaje de join*/
         IRCMsg_Join(&rplJ, prefix, NULL, NULL, pChan);
         sendData(sck, ssl, TCP, NULL, 0, rplJ, strlen(rplJ));
+        /*Hay que mandar el mensaje de JOIN a todos los usauarios del canal*/
+        IRCTAD_ListNicksOnChannelArray(pChan, &lNicks, &nNicks);
+        for (i = 0; i < nNicks; i++) {
+            if (!strcmp(nick, lNicks[i])) {
+                IRC_MFree(1, &lNicks[i]);
+                continue;
+            }
+            id = sckN = 0;
+            retval = IRCTADUser_GetData(&id, &user, &lNicks[i], &real, &host, &IP, &sckN, &creationTS,
+                    &actionTS, &away);
+            if (retval != IRC_OK) {
+                IRC_MFree(6, &user, &lNicks[i], &real, &host, &IP, &away);
+                continue;
+            }
+            sendData(sckN, NULL, TCP, NULL, 0, rplJ, strlen(rplJ));
+            IRC_MFree(6, &user, &lNicks[i], &real, &host, &IP, &away);
+        }
+        free(lNicks);
+        lNicks = NULL;
 
         /*Creamos el mensaje de topic*/
         IRCTAD_GetTopic(pChan, &topic);
@@ -958,18 +1052,13 @@ int joinCommand(char* command, char* nick, int sck, SSL *ssl) {
         sendData(sck, ssl, TCP, NULL, 0, rplT, strlen(rplT));
 
         /*Creamos el mensaje de names*/
-        /*Obtenemos el tipo del canal*/
-        type = IRCTADChan_GetModeChar(pChan);
-        /*Obtenemos la lista de usuarios en el canal*/
-        IRCTAD_ListNicksOnChannel(pChan, &lNicks, &nNicks);
-        if (type)
-            IRCMsg_RplNamReply(&rplN, MY_ADDR, nick, type, pChan, lNicks);
-        else
-            IRCMsg_RplNamReply(&rplN, MY_ADDR, nick, "", pChan, lNicks);
+        getNamesMsg(&rplN, &rplNE, pChan, nick);
+
         sendData(sck, ssl, TCP, NULL, 0, rplN, strlen(rplN));
+        sendData(sck, ssl, TCP, NULL, 0, rplNE, strlen(rplNE));
 
 
-        IRC_MFree(6, &rplJ, &rplN, &rplT, &lNicks, &type, &topic);
+        IRC_MFree(7, &rplJ, &rplN, &rplNE, &rplT, &lNicks, &type, &topic);
         pChan = strtok(NULL, ",");
     }
 
@@ -1035,19 +1124,19 @@ long channelsMode(char **chanlist, char *user, char *nick) {
  */
 int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
 
-    char *prefix = NULL, *errmsg = NULL;
+    char *prefix = NULL, *errmsg = NULL, modeChan[4];
     char *user = NULL, *real = NULL, *host = NULL, *IP = NULL;
     char *away = NULL;
     char *rplWho = NULL, *rplEnd = NULL;
     int sck2 = 0, i;
-    long id = 0, retval = 0, actionTS = 0, creationTS = 0 ,num = 0;
+    long id = 0, retval = 0, actionTS = 0, creationTS = 0, num = 0;
 
-    char *mask =NULL, *oppar=NULL;
-    char **nicks =NULL;
+    char *mask = NULL, *oppar = NULL;
+    char **nicks = NULL;
 
     char aste = '*';
 
-    retval = IRCParse_Who (command, &prefix, &mask, &oppar);
+    retval = IRCParse_Who(command, &prefix, &mask, &oppar);
     if (retval == IRCERR_NOSTRING || retval == IRCERR_ERRONEUSCOMMAND) {
         IRCMsg_ErrNoNickNameGiven(&errmsg, MY_ADDR, nick);
         sendData(sck, ssl, TCP, NULL, 0, errmsg, strlen(errmsg));
@@ -1055,31 +1144,34 @@ int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
         return -1;
     }
     /*who un solo user*/
-    if(mask != NULL && mask[0] != '#'){
+    if (mask != NULL && mask[0] != '#') {
 
         retval = IRCTADUser_GetData(&id, &user, &mask, &real, &host, &IP, &sck2,
                 &creationTS, &actionTS, &away);
-
-        IRCMsg_RplWhoReply (&rplWho, MY_ADDR, nick, mask, user, host, IP, mask, "H", 0, real);
+        if (!away)
+            strcpy(modeChan, "H");
+        else
+            strcpy(modeChan, "G");
+        IRCMsg_RplWhoReply(&rplWho, MY_ADDR, nick, mask, user, host, IP, mask, modeChan, 0, real);
         sendData(sck, ssl, TCP, NULL, 0, rplWho, strlen(rplWho));
 
         IRC_MFree(6, &user, &real, &host, &IP, &away, &rplWho);
 
-        IRCMsg_RplEndOfWho (&rplEnd, MY_ADDR, nick, nick);
+        IRCMsg_RplEndOfWho(&rplEnd, MY_ADDR, nick, nick);
         sendData(sck, ssl, TCP, NULL, 0, rplEnd, strlen(rplEnd));
 
-        IRC_MFree(4, &prefix,&rplEnd, &mask, &oppar);
+        IRC_MFree(4, &prefix, &rplEnd, &mask, &oppar);
 
         return 0;
     }
     /*Caso mask vacio, imprimimos todo el canal*/
-    if(mask==NULL){
+    if (mask == NULL) {
 
         mask = &aste;
-        IRCTADUser_GetNickList (&nicks, &num);
+        IRCTADUser_GetNickList(&nicks, &num);
 
-    /*Caso mask vacio, imprimimos todo el canal*/
-    }else if (mask[0] == '#'){
+        /*Caso mask vacio, imprimimos todo el canal*/
+    } else if (mask[0] == '#') {
 
         retval = IRCTAD_ListNicksOnChannelArray(mask, &nicks, &num);
         if (retval == IRCERR_NOVALIDCHANNEL) {
@@ -1101,7 +1193,7 @@ int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
         retval = IRCTADUser_GetData(&id, &user, &nicks[i], &real, &host, &IP, &sck2,
                 &creationTS, &actionTS, &away);
 
-        IRCMsg_RplWhoReply (&rplWho, MY_ADDR, nick, mask, user, host, IP, nicks[i], "H", 0, real);
+        IRCMsg_RplWhoReply(&rplWho, MY_ADDR, nick, mask, user, host, IP, nicks[i], "H", 0, real);
         sendData(sck, ssl, TCP, NULL, 0, rplWho, strlen(rplWho));
 
         IRC_MFree(6, &user, &real, &host, &IP, &away, &rplWho);
@@ -1110,14 +1202,14 @@ int whoCommand(char* command, char* nick, int sck, SSL *ssl) {
     }
     free(nicks);
 
-    IRCMsg_RplEndOfWho (&rplEnd, MY_ADDR, nick, nick);
+    IRCMsg_RplEndOfWho(&rplEnd, MY_ADDR, nick, nick);
     sendData(sck, ssl, TCP, NULL, 0, rplEnd, strlen(rplEnd));
 
 
-    if( *mask =='*')
-        IRC_MFree(3, &prefix,&rplEnd, &oppar);
+    if (*mask == '*')
+        IRC_MFree(3, &prefix, &rplEnd, &oppar);
     else
-        IRC_MFree(4, &prefix,&rplEnd, &mask, &oppar);
+        IRC_MFree(4, &prefix, &rplEnd, &mask, &oppar);
 
 
     return 0;
@@ -1373,40 +1465,6 @@ int topicCommand(char* command, char* nick, int sck, SSL *ssl) {
 }
 
 /**
- * @brief Funcion Auxiliar COMPLEXNICK
-    Consigue el complexUser a partir del nick proporcionado
-    El complexUser devuelto debe ser liberado por el programador
- * @param nick nick de quien se pretende sacar el complexUser
- * @return ComplexUser en OK
- * @return NULL en ERROR
- */
-char* complexNick( char *nick){
-
-    char *away, *user, *real, *host, *IP, *prefix;
-    long id, creationTS, actionTS, retval;
-    int sck;
-    retval = id = actionTS = creationTS = 0;
-    prefix = away = user = real = host = IP = NULL;
-
-    /*Conseguimos los datos mediante el nick proporcionado*/
-    retval = IRCTADUser_GetData(&id, &user, &nick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
-    if (retval != IRC_OK)
-        return NULL;
-
-    /*Contruimos el COMPLEXUSER*/
-    retval = IRC_ComplexUser(&prefix, nick, user, host, MY_ADDR);
-
-    /*liberamos los necesario*/
-    IRC_MFree(5, &user, &real, &host, &IP, &away);
-    id = creationTS = actionTS = 0;
-
-    if (retval != IRC_OK)
-        return NULL;
-    return prefix;
-}
-
-
-/**
  * @brief Ejecuta el comando PART
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
@@ -1436,7 +1494,7 @@ int partCommand(char* command, char* nick, int sck, SSL *ssl) {
                 sendErrMsg(retval, sck, ssl, nick, pChan);
                 pChan = strtok(NULL, ",");
                 continue;
-            } else{
+            } else {
 
                 /*Obtenemos lo datos del usuario para crear el complex user*/
                 IRCTADUser_GetData(&id, &user, &newnick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
@@ -1476,7 +1534,7 @@ int kickCommand(char* command, char* nick, int sck, SSL *ssl) {
         IRC_MFree(4, &prefix, &channel, &user, &comment);
         return -1;
     }
-    if((IRCTAD_GetUserModeOnChannel(channel, nick) & IRCUMODE_OPERATOR) != IRCUMODE_OPERATOR) {
+    if ((IRCTAD_GetUserModeOnChannel(channel, nick) & IRCUMODE_OPERATOR) != IRCUMODE_OPERATOR) {
         IRCMsg_ErrChanOPrivsNeeded(&errmsg, MY_ADDR, nick, channel);
         sendData(sck, ssl, TCP, NULL, 0, errmsg, strlen(errmsg));
         IRC_MFree(5, &prefix, &channel, &user, &comment, &errmsg);
@@ -1493,10 +1551,10 @@ int kickCommand(char* command, char* nick, int sck, SSL *ssl) {
 
         /*conseguimos el complexUser*/
         prefix = complexNick(nick);
-        if(!prefix){
+        if (!prefix) {
             /*el usuario ha sido kickeado con exito pero no se consiguie bien el complexUser*/
             IRCMsg_Kick(&rply, MY_ADDR, channel, user, comment);
-        }else {
+        } else {
             IRCMsg_Kick(&rply, prefix, channel, user, comment);
             free(prefix);
         }
@@ -1504,7 +1562,7 @@ int kickCommand(char* command, char* nick, int sck, SSL *ssl) {
         sendData(sck_kicked, NULL, TCP, NULL, 0, rply, strlen(rply));
         IRC_MFree(9, &channel, &user, &comment, &nick_kicked, &real, &host, &IP, &away, &rply);
         return 0;
-        }
+    }
 }
 
 /**

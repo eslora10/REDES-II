@@ -109,7 +109,7 @@ void handler(int signal) {
     close(sck);
     close(sck_ssl);
     syslog(LOG_INFO, "Closing IRC Server");
-    cerrar_canal_SSL(ssl, ctx);
+    cerrar_canal_SSL(NULL, ctx);
     closelog();
     exit(EXIT_SUCCESS);
 }

@@ -7,6 +7,9 @@
 
 #define MAX_TCP 65535
 
+
+SSL* ssl_channel;
+
 int sck; /*Socket en el que se conecta el cliente*/
 char hostName[MAXLEN]; /*Nombre de host que nos asigna el servidor al entrar en el.
                  * Usado para el envío de ficheros*/

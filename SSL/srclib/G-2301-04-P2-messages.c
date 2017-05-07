@@ -89,12 +89,12 @@ int msgJoin(char *m_in) {
 
     /*Hacemos una query del modo al servidor*/
     IRCMsg_Mode(&msgMode, NULL, channel, NULL, NULL);
-    send(sck, msgMode, strlen(msgMode), 0);
+    sendData(sck,ssl_channel, TCP, NULL, 0, msgMode, strlen(msgMode));
     IRCInterface_PlaneRegisterOutMessageThread(msgMode);
 
     /*Hacemos una query de los nicks en el canal al servidor*/
     IRCMsg_Who(&msgWho, NULL, channel, NULL);
-    send(sck, msgWho, strlen(msgWho), 0);
+    sendData(sck, ssl_channel, TCP, NULL, 0, msgWho, strlen(msgWho));
     IRCInterface_PlaneRegisterOutMessageThread(msgWho);
 
     /*El servidor envia un mensaje de join cada vez que un usuario nuevo llega al canal*
