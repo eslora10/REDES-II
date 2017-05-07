@@ -3,8 +3,8 @@
 /**
  * @brief Realiza todas las llamadas necesarias para que la apli-
  * cación pueda usar la capa segura SSL.
- * @param cert_file nombre del certificado de la CA
- * @param cert_path ruta del certificado de la CA
+ * @param ca_cert nombre del certificado de la CA
+ * @param clserv_pem ruta del certificado del cliente o el servidor
  * @return contexto creado
  * @return NULL en caso de error
 */
@@ -42,10 +42,10 @@ SSL_CTX* nuevo_contexto_ssl() {
 /**
  * @brief Carga los certificados con los que trabajara la aplicacion
  * @param ctx contexto de la conexion
- * @param CertFile nombre del fichero donde se encuentra el certificado 
- * de la CA y la clave privada 
- * @param CertPath direccion del fichero con el certificado 
- * de la CA y la clave privada 
+ * @param CertFile nombre del fichero donde se encuentra el certificado
+ * de la CA y la clave privada
+ * @param CertPath direccion del fichero con el certificado
+ * de la CA y la clave privada
  * @return NULL en caso de fallo
  * @return puntero al contexto
  */
@@ -113,7 +113,7 @@ SSL* nueva_conexion_ssl(SSL_CTX* ctx, int sck) {
 }
 
 /**
- * @brief Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando 
+ * @brief Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando
  * el proceso de handshake con el otro extremo
  * @param ctx contexto de la aplicacion
  * @param sck descriptor del socket
@@ -158,7 +158,7 @@ SSL* aceptar_canal_seguro_SSL(SSL_CTX* ctx, int sck) {
 }
 
 /**
- * @brief comprobará una vez realizado el handshake que el canal de comunicación se puede 
+ * @brief comprobará una vez realizado el handshake que el canal de comunicación se puede
  * considerar seguro
  * @param ssl puntero a la estructura de conexión ssl
  * @return -1 en caso de error
@@ -213,23 +213,3 @@ void cerrar_canal_SSL(SSL *ssl, SSL_CTX* ctx){
     if(ctx)
         SSL_CTX_free(ctx);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

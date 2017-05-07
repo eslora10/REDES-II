@@ -1,5 +1,12 @@
 #include "../includes/G-2301-04-P3-redes2.h"
 
+
+/**
+ * @brief funcion de inicializacion de la transmision
+ * @param sender
+ * @param msg
+ * @return  0 en OK, -1 en ERROR
+ */
 int audioChat(char *sender, char *msg) {
     int port;
     char send_recv[16], ip[64], audiochat[16], *command = NULL, privmsg[512];
@@ -15,10 +22,10 @@ int audioChat(char *sender, char *msg) {
     /*/001AUDIOCHAT sender ip port*/
     /*Parseamos la cadena*/
     sscanf(msg, "%s %s %s %d", audiochat, send_recv, ip, &port);
-    
+
     args->port = port;
     args->ip = ip;
-    
+
     if (!strcmp(send_recv, "sender")) {
         /*El privmsg solicita la recepcion de un mensaje de voz*/
         /*Creamos un nuevo privmsg con nuestros datos para el emisor*/
@@ -55,6 +62,10 @@ int audioChat(char *sender, char *msg) {
 
 }
 
+/**
+ * @brief funcion de recepcion de audio
+ * @param args
+ */
 void *audioRecv(void *args) {
     int sckA;
     char buffer[256];
@@ -93,6 +104,11 @@ void *audioRecv(void *args) {
 
 }
 
+
+/**
+ * @brief funcion de envio de audio
+ * @param args
+ */
 void *audioSend(void *args) {
     int sckA;
     char buffer[256];
@@ -119,11 +135,11 @@ void *audioSend(void *args) {
         IRCSound_RecordSound(buffer, 160);
         sendData(sckA, NULL, UDP, (*(struct audioArgs*) args).ip, (*(struct audioArgs*) args).port, buffer, 160);
     } while(!stopAudio);
-    
+
     stopAudio = 0;
     bzero(buffer, 216);
     strcpy(buffer, "STOP");
-    
+
     sendData(sckA, NULL, UDP, (*(struct audioArgs*) args).ip, (*(struct audioArgs*) args).port, buffer, strlen(buffer));
 
     close(sckA);

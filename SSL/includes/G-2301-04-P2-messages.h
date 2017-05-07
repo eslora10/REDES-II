@@ -254,13 +254,6 @@ int msgTopicChanged(char *m_in);
  */
 int msgNoNickOrChannel(char *m_in);
 
-
-/**
- * @typedef pFuncs
- * @brief Definimos el tipo funcion comando
- */
-typedef int (*pMsg)(char *m_in);
-
 /**
  * Parsea el mensaje de Part
  * @param m_in mensaje que se va a parsear
@@ -310,6 +303,11 @@ int msgBack(char *m_in);
  */
 int msgrplAway(char *m_in);
 
+/**
+ * @typedef pFuncs
+ * @brief Definimos el tipo funcion comando
+ */
+typedef int (*pMsg)(char *m_in);
 
 /**
  * @var Commands
