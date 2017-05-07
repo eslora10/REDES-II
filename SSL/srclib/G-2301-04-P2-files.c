@@ -11,8 +11,9 @@
 
 
 /**
- * @brief funcion que se encarga de recibir el fichero
- * @param args
+ * @brief Gestiona el proceso de recepcion de ficheros
+ * @param args estructura que contiene informacion sobre la recepcion
+ * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 void* fileReceiver(void *args) {
     FILE *fd;
@@ -53,10 +54,10 @@ void* fileReceiver(void *args) {
 
 
 /**
- * @brief funcion de handshake
- * @param nick
- * @param msg
- * @return  0 en OK, -1 en ERROR
+ * @brief Acepta la recepcion del envio de ficheros y abre un socket para ello
+ * @param nick nick del emisor
+ * @param msg comando que contiene la informacion necesaria para gestionar la recepcion
+ * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 int fileDialog(char *nick, char *msg) {
     char ip[64], filename[64], fsend[6], path[66];
@@ -112,8 +113,9 @@ int fileDialog(char *nick, char *msg) {
 
 
 /**
- * @brief funcion de envio del fichero
- * @param fs file descriptor
+ * @brief Gestiona el proceso de envio
+ * @param fs estructura que contiene informacion sobre el envio
+ * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 void* fileSender(void *fs) {
     struct timeval tv;
