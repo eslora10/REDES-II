@@ -137,7 +137,9 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
                     if (retval!= IRC_OK) {
                         sendErrMsg(retval, cl_sck, ssl, "*", "*");
                         nickDone = 0;
+                        nickname=NULL;
                     }
+                    if(nickname==NULL) break;
                     if(strlen(nickname)>MAX_NICK){
                         sendErrMsg(IRCERR_INVALIDNICK,cl_sck, ssl, "*","*");
                         nickDone= 0;
@@ -154,7 +156,8 @@ int beginConnection(int cl_sck, SSL* ssl,  char** pBuffer, char** nick) {
                     if (retval!=IRC_OK) {
                         sendErrMsg(retval, cl_sck, ssl, "*", command);
                         IRC_MFree(1,&nickname);
-                        return ERROR;
+                        nickDone=0;
+                        break;
                     }
 
                     /*Obtenemos el nombre de servidor del cliente*/
