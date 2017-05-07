@@ -34,6 +34,45 @@
 #define MAX_NICK 9
 
 /**
+ * @brief Envia PING a todos los usuarios, parte del protocolo ping-pong
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int ping();
+
+/**
+ * @brief Inicia la conexion con el cliente. Espera los comandos
+ * NICK, USER en este orden, si no se cierra la conexion con el cliente
+ * @param cl_sck identificador de fichero con el socket
+ * @param pBuffer buffer para la recepcion de mensajes
+ * @param nick cadena de caracteres en la que se guardara el nick del
+ * nuevo usuario
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int pongCommand(char* command, char* nick, int sck, SSL *ssl);
+
+/**
+ * @brief Inicia la conexion con el cliente. Espera los comandos
+ * NICK, USER en este orden, si no se cierra la conexion con el cliente
+ * @param cl_sck identificador de fichero con el socket
+ * @param pBuffer buffer para la recepcion de mensajes
+ * @param nick cadena de caracteres en la que se guardara el nick del
+ * nuevo usuario
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int checkConnection();
+
+/**
+ * @brief Inicia la conexion con el cliente. Espera los comandos
+ * NICK, USER en este orden, si no se cierra la conexion con el cliente
+ * @param cl_sck identificador de fichero con el socket
+ * @param pBuffer buffer para la recepcion de mensajes
+ * @param nick cadena de caracteres en la que se guardara el nick del
+ * nuevo usuario
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+void* pingpong();
+
+/**
  * @brief Dado un socket acepta la peticion de un cliente
  * @param sck_ssl descriptor del socket
  */

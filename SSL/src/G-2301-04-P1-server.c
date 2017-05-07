@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     int i, cl_sck;
     int long_index;
     char opt;
-    pthread_t thread, ssl_thread;
+    pthread_t thread, ssl_thread, pingthread;
     Sck_SSL *argAttend = NULL;
 
     static struct option options[] = {
@@ -160,6 +160,7 @@ int main(int argc, char** argv) {
     Commands[30] = whoCommand;
     Commands[31] = whoisCommand;
     Commands[34] = pingCommand;
+    Commands[35] = pongCommand;
     Commands[37] = awayCommand;
 
 
@@ -212,6 +213,15 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Error bind");
         return -1;
     }
+	/*Hilo pingpong*/
+	if (pthread_create(&pingthread, NULL, pingpong, NULL) < 0) {
+            syslog(LOG_ERR, "Error creating thread");
+            return -1;
+        }
+	if (pthread_detach(pingthread) < 0) {
+            syslog(LOG_ERR, "Error  detach");
+            return -1;
+        }
 
     while (1) {
         if ((cl_sck = acceptSocket(sck)) < 0) {
