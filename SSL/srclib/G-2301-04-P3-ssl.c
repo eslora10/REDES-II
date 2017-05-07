@@ -1,6 +1,15 @@
 #include "../includes/G-2301-04-P3-redes2.h"
 
 /**
+ * Modulo de ssl. Contiene funciones de alto nivel para la gestion
+ * de uncliente en modo seguridad ssl.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P3-ssl.c
+ */
+
+/**
  * @brief Realiza todas las llamadas necesarias para que la apli-
  * cación pueda usar la capa segura SSL.
  * @param ca_cert nombre del certificado de la CA

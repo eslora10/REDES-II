@@ -1,6 +1,15 @@
 #include "../includes/G-2301-04-P2-userCommands.h"
 
 /**
+ * Modulo de comandos de usuario. Contiene funciones de alto nivel para la gestion
+ * de comandos que ejecuta el cliente.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P2-userCommands.c
+ */
+
+/**
  * Accion por defecto para los mensajes
  * @param m_in mensaje que se va a parsear
  * @return 0 si OK

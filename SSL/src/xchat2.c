@@ -2,8 +2,6 @@
 #include "../includes/G-2301-04-P3-redes2.h"
 #include <getopt.h>
 
-SSL* ssl_channel = NULL;
-
 
 void cambioModeChannel(char* channel, char* mode, char* option) {
     char *command = NULL;
@@ -35,7 +33,7 @@ void* recvInfo(void* sck) {
 
     while (1) {
         bzero(buffer, MAX_TCP);
-	retval = recv((*(int*)sck), buffer, MAX_TCP, 0);
+	retval = receiveData((*(int*)sck), ssl_channel, TCP, NULL, 0, buffer, MAX_TCP);
 
         if (retval <= 0) {
             perror("Error recv");
@@ -1442,7 +1440,7 @@ int main(int argc, char *argv[]) {
     };
 
     /*printf("%ld\n", IRC_CommandQuery(":irc.eps.net 332 ornstein #redes2 :Canal para debatir sobre IRC"));*/
-
+    ssl_channel = NULL;
 
     for (i = 0; i < 64; i++)
         UserCommands[i] = userCommandDefault;

@@ -1,6 +1,15 @@
 #include "../includes/G-2301-04-P3-redes2.h"
 
 /**
+ * Modulo de mensajes. Contiene funciones de alto nivel para la gestion
+ * de mensajes que llegan al servidor.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P2-messages.c
+ */
+
+/**
  * Accion por defecto para los mensajes
  * @param m_in mensaje que se va a parsear
  * @return 0 si OK
@@ -89,12 +98,12 @@ int msgJoin(char *m_in) {
 
     /*Hacemos una query del modo al servidor*/
     IRCMsg_Mode(&msgMode, NULL, channel, NULL, NULL);
-    send(sck, msgMode, strlen(msgMode), 0);
+    sendData(sck,ssl_channel, TCP, NULL, 0, msgMode, strlen(msgMode));
     IRCInterface_PlaneRegisterOutMessageThread(msgMode);
 
     /*Hacemos una query de los nicks en el canal al servidor*/
     IRCMsg_Who(&msgWho, NULL, channel, NULL);
-    send(sck, msgWho, strlen(msgWho), 0);
+    sendData(sck, ssl_channel, TCP, NULL, 0, msgWho, strlen(msgWho));
     IRCInterface_PlaneRegisterOutMessageThread(msgWho);
 
     /*El servidor envia un mensaje de join cada vez que un usuario nuevo llega al canal*

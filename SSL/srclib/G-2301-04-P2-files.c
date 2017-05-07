@@ -1,19 +1,19 @@
 /**
- * Modulo de sockets. Contiene funciones de alto nivel para el manejo de
- * sockets así como la función que manejan los hilos y la que daemoniza.
+ * Modulo de ficheros. Contiene funciones de alto nivel para el envio de ficheros
+ * desde la interfaz de usuario.
  * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
  * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
  * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
- * @file G-2301-04-P1-socket.h
+ * @file G-2301-04-P2-files.c
  */
-
 
 #include "../includes/G-2301-04-P3-redes2.h"
 
 
 /**
- * @brief funcion que se encarga de recibir el fichero
- * @param args
+ * @brief Gestiona el proceso de recepcion de ficheros
+ * @param args estructura que contiene informacion sobre la recepcion
+ * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 void* fileReceiver(void *args) {
     FILE *fd;
@@ -54,10 +54,10 @@ void* fileReceiver(void *args) {
 
 
 /**
- * @brief funcion de handshake
- * @param nick
- * @param msg
- * @return  0 en OK, -1 en ERROR
+ * @brief Acepta la recepcion del envio de ficheros y abre un socket para ello
+ * @param nick nick del emisor
+ * @param msg comando que contiene la informacion necesaria para gestionar la recepcion
+ * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 int fileDialog(char *nick, char *msg) {
     char ip[64], filename[64], fsend[6], path[66];
@@ -113,8 +113,9 @@ int fileDialog(char *nick, char *msg) {
 
 
 /**
- * @brief funcion de envio del fichero
- * @param fs file descriptor
+ * @brief Gestiona el proceso de envio
+ * @param fs estructura que contiene informacion sobre el envio
+ * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 void* fileSender(void *fs) {
     struct timeval tv;

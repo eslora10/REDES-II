@@ -4,7 +4,7 @@
  * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
  * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
  * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
- * @file G-2301-04-P1-socket.h
+ * @file G-2301-04-P1-socket.c
  */
 
 #include "../includes/G-2301-04-P3-redes2.h"

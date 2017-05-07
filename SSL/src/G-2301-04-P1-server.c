@@ -109,7 +109,7 @@ void handler(int signal) {
     close(sck);
     close(sck_ssl);
     syslog(LOG_INFO, "Closing IRC Server");
-    cerrar_canal_SSL(ssl, ctx);
+    cerrar_canal_SSL(NULL, ctx);
     closelog();
     exit(EXIT_SUCCESS);
 }
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
     Sck_SSL *argAttend = NULL;
 
     static struct option options[] = {
-		{"port", required_argument, 0,'1'},
+	{"port", required_argument, 0,'1'},
         {"ssl", no_argument, 0, '2'},
         {"s", no_argument, 0, '3'},
         {"help", no_argument, 0, '4'},
@@ -164,9 +164,12 @@ int main(int argc, char** argv) {
     Commands[37] = awayCommand;
 
 
-    //daemonizar();
     syslog(LOG_INFO, "Initializing IRC Server");
 
+    if(argc == 1)
+        /*Daemonizamos solo en el caso de que el servidor sea sin ssl ya que el demonio
+          se mueve al directorio raiz y desde ahí no se pueden cargar los certificados*/
+        daemonizar();
 
 
 
@@ -175,6 +178,8 @@ int main(int argc, char** argv) {
             case '1':
                 port = atoi(optarg);
 
+            case '2':
+            case '3':
                 /*Creamos un hilo y le asignamos la funcion attendClientSockeet*/
                 if (pthread_create(&ssl_thread, NULL, SSLConnections, NULL) < 0) {
                     syslog(LOG_ERR, "Error creating thread");
@@ -184,10 +189,7 @@ int main(int argc, char** argv) {
                 if (pthread_detach(ssl_thread) < 0) {
                     syslog(LOG_ERR, "Error  detach");
                     return -1;
-                }
-            case '2':
-            case '3':
-                /*Bandera de ssl*/
+                } 
                 break;
             case '4':
             case '5':
