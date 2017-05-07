@@ -10,7 +10,7 @@
 #include "../includes/G-2301-04-P3-redes2.h"
 #include <time.h>
 
-int users[MAXCHANNEL];
+int users[MAXCHANNEL+1];
 
 
 /**
