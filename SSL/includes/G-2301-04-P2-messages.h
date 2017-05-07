@@ -1,6 +1,15 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
+/**
+ * Modulo de mensajes. Contiene funciones de alto nivel para la gestion
+ * de mensajes que llegan al servidor.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P2-messages.h
+ */
+
 #include <redes2/irc.h>
 #include <redes2/ircxchat.h>
 #include "G-2301-04-P1-socket.h"

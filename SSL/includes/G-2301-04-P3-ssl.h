@@ -1,6 +1,15 @@
 #ifndef SSL_H
 #define SSL_H
 
+/**
+ * Modulo de ssl. Contiene funciones de alto nivel para la gestion
+ * de uncliente en modo seguridad ssl.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P3-ssl.h
+ */
+
 #include <stdio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>

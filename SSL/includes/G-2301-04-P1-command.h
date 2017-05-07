@@ -40,13 +40,11 @@
 int ping();
 
 /**
- * @brief Inicia la conexion con el cliente. Espera los comandos
- * NICK, USER en este orden, si no se cierra la conexion con el cliente
- * @param cl_sck identificador de fichero con el socket
- * @param pBuffer buffer para la recepcion de mensajes
- * @param nick cadena de caracteres en la que se guardara el nick del
- * nuevo usuario
- * @return 0 si todo ha ido bien, -1 en caso de error
+ * @brief Ejecuta el comando PONG
+ * @param command comando que se va a parsear y ejecutar
+ * @param nick nickname del usuario que ejecuta el comando
+ * @param sck socket en el que se recibio el comando
+ * @return -1 en caso de fallo, 0 OK
  */
 int pongCommand(char* command, char* nick, int sck, SSL *ssl);
 
@@ -62,12 +60,7 @@ int pongCommand(char* command, char* nick, int sck, SSL *ssl);
 int checkConnection();
 
 /**
- * @brief Inicia la conexion con el cliente. Espera los comandos
- * NICK, USER en este orden, si no se cierra la conexion con el cliente
- * @param cl_sck identificador de fichero con el socket
- * @param pBuffer buffer para la recepcion de mensajes
- * @param nick cadena de caracteres en la que se guardara el nick del
- * nuevo usuario
+ * @brief Funcion que ejecuta el hilo de pingpong
  * @return 0 si todo ha ido bien, -1 en caso de error
  */
 void* pingpong();
@@ -165,7 +158,7 @@ int topicCommand(char* command, char* nick, int sck, SSL *ssl);
 
 
 /**
- * @brief Ejecuta el comando LIST
+ * @brief Ejecuta el comando NAMES
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando

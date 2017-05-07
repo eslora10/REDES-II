@@ -1,12 +1,11 @@
 /**
- * Modulo de sockets. Contiene funciones de alto nivel para el manejo de
- * sockets así como la función que manejan los hilos y la que daemoniza.
+ * Modulo de ficheros. Contiene funciones de alto nivel para el envio de ficheros
+ * desde la interfaz de usuario.
  * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
  * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
  * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
- * @file G-2301-04-P1-socket.h
+ * @file G-2301-04-P2-files.c
  */
-
 
 #include "../includes/G-2301-04-P3-redes2.h"
 

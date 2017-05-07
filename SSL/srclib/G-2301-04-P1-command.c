@@ -60,7 +60,6 @@ int checkConnection(){
 				creationTS = actionTS = sck =0;
                                 /*indexa por indice*/
 				IRCTADUser_GetData(&id, &user, &nick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
-				IRCTAD_Quit(nick);
 				IRCMsg_Notice(&notice, MY_ADDR, nick, "Leaving server PING...");
 				sendData(sck, NULL/*ssl*/, TCP, NULL, 0, notice, strlen(notice));
                                 close(sck);
