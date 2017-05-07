@@ -8,6 +8,79 @@
 */
 
 #include "../includes/G-2301-04-P3-redes2.h"
+#include <time.h>
+
+int users[MAXCHANNEL+1];
+
+
+/**
+ * @brief Envia PING a todos los usuarios, parte del protocolo ping-pong
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int ping(){
+	char ** nicks = NULL;
+	char *rply = NULL, *user = NULL, *real = NULL, *host = NULL, *away = NULL, *IP = NULL;
+	long nelements = 0, retval = 0, creationTS = 0, actionTS = 0, id = 0;
+	int i, sckuser = 0;
+
+	IRCTADUser_GetNickList(&nicks, &nelements);
+	for (i = 0; i<nelements+1; i++) users[i] = 1;
+	if(nicks != NULL){
+		retval = IRCMsg_Ping(&rply, NULL ,MY_ADDR, NULL);
+		if (retval == IRCERR_NOSERVER) return -1;
+		for(i = 0; i<nelements; i++){
+			user = real = host = away = IP = NULL;
+			creationTS = actionTS = id = sckuser = 0;
+			retval = IRCTADUser_GetData(&id, &user, &nicks[i], &real, &host, &IP, &sckuser, &creationTS, &actionTS, &away);
+			sendData(sckuser, NULL/*ssl*/, TCP, NULL, 0, rply, strlen(rply));
+			//IRC_MFree(5, &user, &real, &host, &IP, &away);
+		}
+		//free(nicks);
+	}
+	return 0;
+}
+
+/**
+ * @brief Comprueba si un usuario no ha devuelto PONG
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+int checkConnection(){
+	char **nicks = NULL;
+	char *notice = NULL, *user = NULL, *real = NULL, *host = NULL, *away = NULL, *nick = NULL, *IP = NULL;
+	long creationTS = 0, actionTS = 0, nelements = 0, id = 0;
+	int sck = 0, i;
+
+	IRCTADUser_GetNickList(&nicks, &nelements);
+	if(nicks != NULL) {
+		for(i = 0; i < nelements; i++){
+			id = i+1;
+			if(users[id] == 1){	
+				user = real = host = away = IP = NULL;
+				creationTS = actionTS = 0;
+				IRCTADUser_GetData(&id, &user, &nick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
+				IRCTAD_Quit(nick);
+				IRCMsg_Notice(&notice, MY_ADDR, nick, "Leaving server PING...");
+				sendData(sck, NULL/*ssl*/, TCP, NULL, 0, notice, strlen(notice));
+			}
+		}
+	//free(nicks);
+	}
+	return 0;
+}
+
+/**
+ * @brief Funcion que ejecuta el hilo de ping-pong
+ * @return 0 si todo ha ido bien, -1 en caso de error
+ */
+void* pingpong(){
+	while(1){
+		sleep(30);
+		ping();
+		sleep(15);
+		checkConnection();
+	}
+	return 0;
+}
 
 
 /**
@@ -1292,6 +1365,26 @@ int pingCommand(char* command, char* nick, int sck, SSL *ssl) {
     sendData(sck, ssl, TCP, NULL, 0, rply, strlen(rply));
     IRC_MFree(5, &prefix, &server, &server2, &msg, &rply);
     return 0;
+}
+
+/**
+ * @brief Ejecuta el comando PONG
+ * @param command comando que se va a parsear y ejecutar
+ * @param nick nickname del usuario que ejecuta el comando
+ * @param sck socket en el que se recibio el comando
+ * @return -1 en caso de fallo, 0 OK
+ */
+int pongCommand(char* command, char* nick, int sck, SSL *ssl){
+	char *user = NULL, *real = NULL, *host = NULL, *away = NULL;
+	char *prefix = NULL, *server = NULL, *server2 = NULL, *msg = NULL, *IP = NULL;
+	long id = 0, creationTS = 0, actionTS = 0;
+
+	IRCParse_Pong(command, &prefix, &server, &server2, &msg);
+	IRCTADUser_GetData(&id, &user, &nick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
+	users[id] = 0;
+	IRC_MFree(7, &prefix, &server, &user, &real,
+                &host, &IP, &away);
+	return 0;
 }
 
 /**
