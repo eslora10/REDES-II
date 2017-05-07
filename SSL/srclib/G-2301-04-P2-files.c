@@ -1,5 +1,20 @@
+/**
+ * Modulo de sockets. Contiene funciones de alto nivel para el manejo de
+ * sockets así como la función que manejan los hilos y la que daemoniza.
+ * @author Antonio Amor Mourelle &lt;antonio.amor@estudiante.uam.es&gt;
+ * @author Esther Lopez Ramos &lt;esther.lopezramos@estudiante.uam.es&gt;
+ * @author Mario Santiago Yepes &lt;mario.santiagoy@estudiante.uam.es&gt;
+ * @file G-2301-04-P1-socket.h
+ */
+
+
 #include "../includes/G-2301-04-P3-redes2.h"
 
+
+/**
+ * @brief funcion que se encarga de recibir el fichero
+ * @param args
+ */
 void* fileReceiver(void *args) {
     FILE *fd;
     char *buffer;
@@ -23,7 +38,7 @@ void* fileReceiver(void *args) {
     bzero(buffer, MAX_TCP);
     len = 0;
     remain_data = (*(struct fileReceiver_args *) args).length;
-    while (((len = receiveData((*(struct fileReceiver_args *) args).sckF, NULL, 
+    while (((len = receiveData((*(struct fileReceiver_args *) args).sckF, NULL,
             TCP, NULL, 0, buffer, MAX_TCP)) > 0) && (remain_data > 0)) {
         fwrite(buffer, sizeof (char), len, fd);
         remain_data -= len;
@@ -37,6 +52,13 @@ void* fileReceiver(void *args) {
     pthread_exit(NULL);
 }
 
+
+/**
+ * @brief funcion de handshake
+ * @param nick
+ * @param msg
+ * @return  0 en OK, -1 en ERROR
+ */
 int fileDialog(char *nick, char *msg) {
     char ip[64], filename[64], fsend[6], path[66];
     long unsigned int len;
@@ -89,6 +111,11 @@ int fileDialog(char *nick, char *msg) {
     return 0;
 }
 
+
+/**
+ * @brief funcion de envio del fichero
+ * @param fs file descriptor
+ */
 void* fileSender(void *fs) {
     struct timeval tv;
     fd_set rfds;
@@ -124,5 +151,3 @@ void* fileSender(void *fs) {
     close((*(struct fileSender_args*) fs).sck);
     pthread_exit(NULL);
 }
-
-
