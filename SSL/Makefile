@@ -21,7 +21,7 @@ _OBJ = cliente_echo.o servidor_echo.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _SRCL = G-2301-04-P1-socket.c G-2301-04-P3-ssl.c G-2301-04-P1-command.c G-2301-04-P2-userCommands.c G-2301-04-P2-messages.c G-2301-04-P2-files.c G-2301-04-P2-audio.c
-SRCL = $(patsubst %,$(SLDIR)/%,$(_SRCL)) 
+SRCL = $(patsubst %,$(SLDIR)/%,$(_SRCL))
 
 _OBJL = G-2301-04-P1-socket.o G-2301-04-P3-ssl.o G-2301-04-P1-command.o G-2301-04-P2-userCommands.o G-2301-04-P2-messages.o G-2301-04-P2-files.o G-2301-04-P2-audio.o
 OBJL = $(patsubst %,$(OLDIR)/%,$(_OBJL))
@@ -33,16 +33,16 @@ certificados:
 	openssl genrsa -out cakey.pem 2048
 	openssl req -new -x509 -key cakey.pem -out cacert.pem -subj /CN=Redes2\ CA
 	cat cacert.pem cakey.pem > certs/ca.pem
-	
+
 	openssl genrsa -out clientekey.pem 2048
 	openssl req -new -key clientekey.pem -out clientecert.pem -subj /CN=G-2301-04-P3-client
-	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in clientecert.pem -out clientecert.pem 
+	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in clientecert.pem -out clientecert.pem
 	cat clientecert.pem clientekey.pem cacert.pem > certs/cliente.pem
 	rm clientekey.pem clientecert.pem
 
 	openssl genrsa -out servidorkey.pem 2048
 	openssl req -new -key servidorkey.pem -out servidorcert.pem -subj /CN=G-2301-04-P3-server
-	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in servidorcert.pem -out servidorcert.pem 
+	openssl x509 -req -CAcreateserial -CA certs/ca.pem -in servidorcert.pem -out servidorcert.pem
 	cat servidorcert.pem servidorkey.pem cacert.pem > certs/servidor.pem
 	rm servidorkey.pem servidorcert.pem
 

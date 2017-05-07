@@ -9,8 +9,6 @@ void *audioSend(void *args);
 
 void *audioRecv(void *args);
 
-void *audioSend(void *args);
-
 struct audioArgs{
     char *ip;
     int port;
