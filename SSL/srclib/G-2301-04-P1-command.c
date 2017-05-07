@@ -33,9 +33,10 @@ int ping(){
 			creationTS = actionTS = id = sckuser = 0;
 			retval = IRCTADUser_GetData(&id, &user, &nicks[i], &real, &host, &IP, &sckuser, &creationTS, &actionTS, &away);
 			sendData(sckuser, NULL/*ssl*/, TCP, NULL, 0, rply, strlen(rply));
-			//IRC_MFree(5, &user, &real, &host, &IP, &away);
+			IRC_MFree(5, &user, &real, &host, &IP, &away);
 		}
-		//free(nicks);
+		free(nicks);
+                free(rply);
 	}
 	return 0;
 }
@@ -54,16 +55,19 @@ int checkConnection(){
 	if(nicks != NULL) {
 		for(i = 0; i < nelements; i++){
 			id = i+1;
-			if(users[id] == 1){	
+			if(users[id] == 1){
 				user = real = host = away = IP = NULL;
-				creationTS = actionTS = 0;
+				creationTS = actionTS = sck =0;
+                                /*indexa por indice*/
 				IRCTADUser_GetData(&id, &user, &nick, &real, &host, &IP, &sck, &creationTS, &actionTS, &away);
 				IRCTAD_Quit(nick);
 				IRCMsg_Notice(&notice, MY_ADDR, nick, "Leaving server PING...");
 				sendData(sck, NULL/*ssl*/, TCP, NULL, 0, notice, strlen(notice));
+                                close(sck);
+                                IRC_MFree(7, &user, &real, &host, &IP, &away ,&notice, &nick);
 			}
 		}
-	//free(nicks);
+	free(nicks);
 	}
 	return 0;
 }
@@ -74,7 +78,7 @@ int checkConnection(){
  */
 void* pingpong(){
 	while(1){
-		sleep(30);
+ 		sleep(120);
 		ping();
 		sleep(15);
 		checkConnection();
@@ -786,7 +790,7 @@ long privToUser(char *nickDest, char *dest, char *prefix, char *msg) {
     /*enviamos el mensaje al user destino*/
     sendData(sckDest, NULL, TCP, NULL, 0, rplPrivmsg, strlen(rplPrivmsg));
 
-    
+
     if (away) r = 1;
     IRC_MFree(6, &rplPrivmsg,
             &user, &real, &host, &IP, &away);
