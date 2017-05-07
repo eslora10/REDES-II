@@ -17,6 +17,8 @@
 int sck;
 int sck_ssl;
 int port = 6669;
+SSL_CTX *ctx = NULL;
+SSL *ssl = NULL;
 
 /**
  * @brief Funcion que se encarga de aceptar conexiones seguras
@@ -26,22 +28,23 @@ int port = 6669;
 void* SSLConnections(void *kk){
     int cl_sck;
     pthread_t thread;
-    SSL_CTX *ctx = NULL;
-    SSL *ssl = NULL;
     Sck_SSL *argAttend = NULL;
 
     /*Se abre un socket seguro que escucha en el puerto 6669*/
     ctx = inicializar_nivel_SSL("certs/ca.pem", "certs/servidor.pem");
     if (!ctx) {
+        syslog(LOG_ERR, "Error loading certificates");
         pthread_exit(NULL);
     }
+
     sck_ssl = openSocket(TCP);
     if (sck_ssl < 0) {
-        perror("Error abriendo socket");
+        syslog(LOG_ERR, "Error opening socket");
         pthread_exit(NULL);
     }
-    if (bindSocket(sck_ssl, port, 1) < 0) {
-        perror("Error en bind");
+
+    if (bindSocket(sck_ssl, port, 1, TCP) < 0) {
+        syslog(LOG_ERR, "Error binding socket");
         close(sck_ssl);
         pthread_exit(NULL);
     }
@@ -50,7 +53,7 @@ void* SSLConnections(void *kk){
         /*Recibimos conexiones de clientes*/
         cl_sck = acceptSocket(sck_ssl);
         if (cl_sck < 0) {
-            perror("Error accept");
+            syslog(LOG_ERR, "Error acepting clients");
             close(sck);
             pthread_exit(NULL);
         }
@@ -58,7 +61,7 @@ void* SSLConnections(void *kk){
         /*Intentamos el hanshake con el cliente*/
         ssl = aceptar_canal_seguro_SSL(ctx, cl_sck);
         if (!ssl) {
-            perror("Error en el handshake inicial");
+            syslog(LOG_ERR, "Error during the initial handshake");
             close(sck);
             close(cl_sck);
             pthread_exit(NULL);
@@ -66,23 +69,28 @@ void* SSLConnections(void *kk){
 
         /*Comprobamos si los certificados del cliente son correctos*/
         if (evaluar_post_connectar_SSL(ssl) < 0) {
+            syslog(LOG_ERR, "Error obtaining client's certificates");
             close(sck);
             close(cl_sck);
             pthread_exit(NULL);
         }
+
         argAttend = (Sck_SSL*) malloc(sizeof(Sck_SSL));
         if(!argAttend){
+            syslog(LOG_ERR, "Memory error");
             close(sck);
             close(cl_sck);
             pthread_exit(NULL);
         }
         argAttend->sck = cl_sck;
         argAttend->ssl = ssl;
+
         /*Creamos un hilo y le asignamos la funcion attendClientSockeet*/
         if (pthread_create(&thread, NULL, attendClientSocket, (void *) argAttend) < 0) {
             syslog(LOG_ERR, "Error creating thread");
             pthread_exit(NULL);
         }
+
 
         if (pthread_detach(thread) < 0) {
             syslog(LOG_ERR, "Error  detach");
@@ -101,6 +109,7 @@ void handler(int signal) {
     close(sck);
     close(sck_ssl);
     syslog(LOG_INFO, "Closing IRC Server");
+    cerrar_canal_SSL(ssl, ctx);
     closelog();
     exit(EXIT_SUCCESS);
 }
@@ -117,6 +126,22 @@ int main(int argc, char** argv) {
     char opt;
     pthread_t thread, ssl_thread, pingthread;
     Sck_SSL *argAttend = NULL;
+
+    static struct option options[] = {
+		{"port", required_argument, 0,'1'},
+        {"ssl", no_argument, 0, '2'},
+        {"s", no_argument, 0, '3'},
+        {"help", no_argument, 0, '4'},
+        {"h", no_argument, 0, '5'},
+        {0, 0, 0, 0}
+    };
+
+
+    if (signal(SIGINT, handler) == SIG_ERR) {
+        syslog(LOG_ERR, "error handler");
+        return -1;
+    }
+
 
     for (i = 0; i < 37; i++)
         Commands[i] = FuncDefault;
@@ -138,20 +163,18 @@ int main(int argc, char** argv) {
     Commands[35] = pongCommand;
     Commands[37] = awayCommand;
 
-    static struct option options[] = {
-		{"port", required_argument, 0,'1'},
-        {"ssl", no_argument, 0, '2'},
-        {"s", no_argument, 0, '3'},
-        {"help", no_argument, 0, '4'},
-        {"h", no_argument, 0, '5'},
-        {0, 0, 0, 0}
-    };
+
+    //daemonizar();
+    syslog(LOG_INFO, "Initializing IRC Server");
+
+
+
 
     while ((opt = getopt_long_only(argc, argv, "1:2:3:4:5:6", options, &long_index)) != -1) {
         switch (opt) {
             case '1':
                 port = atoi(optarg);
-                printf("%d\n", port);
+
                 /*Creamos un hilo y le asignamos la funcion attendClientSockeet*/
                 if (pthread_create(&ssl_thread, NULL, SSLConnections, NULL) < 0) {
                     syslog(LOG_ERR, "Error creating thread");
@@ -165,7 +188,6 @@ int main(int argc, char** argv) {
             case '2':
             case '3':
                 /*Bandera de ssl*/
-
                 break;
             case '4':
             case '5':
@@ -180,14 +202,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    //daemonizar();
-    syslog(LOG_INFO, "Initializing IRC Server");
-
-
-    if (signal(SIGINT, handler) == SIG_ERR) {
-        syslog(LOG_ERR, "error handler");
-        return -1;
-    }
     /*Se abre un socket no seguro que escucha en el puerto 6667*/
     sck = openSocket(TCP);
     if (sck < 0) {
@@ -195,7 +209,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    if (bindSocket(sck, 6667, 10) < 0) {
+    if (bindSocket(sck, 6667, 10, TCP) < 0) {
         syslog(LOG_ERR, "Error bind");
         return -1;
     }

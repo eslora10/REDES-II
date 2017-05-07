@@ -557,7 +557,7 @@ int msgModeChanged(char *m_in) {
  * @return -1 ERROR
  */
 int msgPrivmsg(char *m_in) {
-    char *prefix, *target, *msg, *origin;
+    char *prefix = NULL, *target = NULL, *msg = NULL, *origin = NULL, keyword[16];
     prefix = target = msg = NULL;
 
     if (IRCParse_Privmsg(m_in, &prefix, &target, &msg) != IRC_OK)
@@ -568,7 +568,13 @@ int msgPrivmsg(char *m_in) {
 
     /*Vemos si el mensaje es un FSEND*/
     if (msg[0] == '\001') {
-        return fileDialog(origin, msg);
+        sscanf(msg, "\001%s", keyword);
+        if (!strcmp(keyword, "FSEND")) {
+            return fileDialog(origin, msg);
+        } else {
+            return audioChat(origin, msg);
+        }
+
     }
 
     /*mensaje a grupo*/

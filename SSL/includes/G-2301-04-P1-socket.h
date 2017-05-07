@@ -62,10 +62,10 @@ int openSocket(protocol p);
  * @param sck descriptor del socket
  * @param port puerto con el protocolo de nivel de aplicacion
  * @param max_clients numero maximo de clientes esperando a ser atendidos
- * @return 0 si se realiza todo correctamente, 	
+ * @return 0 si se realiza todo correctamente,
                   -1 en caso de error
  */
-int bindSocket(int sck, uint16_t port, int max_clients);
+int bindSocket(int sck, uint16_t port, int max_clients, protocol p);
 
 /**
  * @brief Acepta conexiones de clientes
