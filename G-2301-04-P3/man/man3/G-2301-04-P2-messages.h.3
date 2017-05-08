@@ -1,0 +1,743 @@
+.TH "/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P2-messages.h" 3 "Mon May 8 2017" "Servidor y cliente IRC" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P2-messages.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <redes2/irc\&.h>\fP
+.br
+\fC#include <redes2/ircxchat\&.h>\fP
+.br
+\fC#include 'G\-2301\-04\-P1\-socket\&.h'\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMAX_TCP\fP   65535"
+.br
+.RI "\fILongitud máxima en bytes de un paquete TCP\&. \fP"
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef int(* \fBpMsg\fP) (char *m_in)"
+.br
+.RI "\fIDefinimos el tipo funcion mensaje\&. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBmsgDefault\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgNickChanged\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgJoin\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgMode\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgNames\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWho\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgNotice\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWelcome\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgYourHost\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgCreated\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgMyInfo\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgIsSupport\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgMOTDStart\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgMOTD\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgMOTDEnd\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgList\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgEndNames\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgNotOperator\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgModeChanged\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWhoisUser\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWhoisServer\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWhoisChannels\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWhoisMode\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWhoisIdle\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgWhoisEnd\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgPrivmsg\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgPing\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgTopicChanged\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgNoNickOrChannel\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgPart\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgQuit\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgKick\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgAway\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgBack\fP (char *m_in)"
+.br
+.ti -1c
+.RI "int \fBmsgrplAway\fP (char *m_in)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "SSL * \fBssl_channel\fP"
+.br
+.RI "\fIVariable con la estructura ssl del cliente IRC\&. \fP"
+.ti -1c
+.RI "int \fBsck\fP"
+.br
+.RI "\fIVariable con el descriptor de fichero del socket del cliente IRC\&. \fP"
+.ti -1c
+.RI "char \fBhostName\fP [\fBMAXLEN\fP]"
+.br
+.RI "\fINombre de host que nos asigna el servidor al entrar en el\&. Usado para el envío de ficheros\&. \fP"
+.ti -1c
+.RI "int \fBstopAudio\fP"
+.br
+.RI "\fIVariable que le indica al hilo emisor o receptor de audio que debe parar de enviar\&. \fP"
+.ti -1c
+.RI "\fBpMsg\fP \fBMessages\fP [2048]"
+.br
+.RI "\fIArray de punteros a las funciones de mensajes del servidor\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Modulo de mensajes\&. Contiene funciones de alto nivel para la gestion de mensajes que llegan al servidor\&. 
+.PP
+\fBAuthor:\fP
+.RS 4
+Antonio Amor Mourelle <antonio.amor@estudiante.uam.es> 
+.PP
+Esther Lopez Ramos <esther.lopezramos@estudiante.uam.es> 
+.PP
+Mario Santiago Yepes <mario.santiagoy@estudiante.uam.es> 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int msgAway (char * m_in)"
+Parsea el mensaje de Away 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgBack (char * m_in)"
+Parsea el mensaje de Back (UNAWAY) 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgCreated (char * m_in)"
+Parsea el mensaje de CREATED 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgDefault (char * m_in)"
+Accion por defecto para los mensajes 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgEndNames (char * m_in)"
+Parsea el mensaje de ENDOFNAMES 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgIsSupport (char * m_in)"
+Parsea el mensaje de ISSUPPORT 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgJoin (char * m_in)"
+Parsea el mensaje de JOIN 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgKick (char * m_in)"
+Parsea el mensaje de Kick 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgList (char * m_in)"
+Parsea el mensaje de LIST 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgMode (char * m_in)"
+Parsea el mensaje de MODE 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgModeChanged (char * m_in)"
+Parsea el mensaje de que se recibe se cambia el modo de un canal 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgMOTD (char * m_in)"
+Parsea el mensaje de MOTD 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgMOTDEnd (char * m_in)"
+Parsea el mensaje de MOTD 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgMOTDStart (char * m_in)"
+Parsea el mensaje de MOTD 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgMyInfo (char * m_in)"
+Parsea el mensaje de MYINFO 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgNames (char * m_in)"
+Parsea el mensaje de NAMES 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgNickChanged (char * m_in)"
+Parsea el mensaje de NICK 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgNoNickOrChannel (char * m_in)"
+Parsea el mensaje de NO NICK OR CHANNEL 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgNotice (char * m_in)"
+Parsea el mensaje de NOTICE 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgNotOperator (char * m_in)"
+Parsea el mensaje de You're not channel operator 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgPart (char * m_in)"
+Parsea el mensaje de Part 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgPing (char * m_in)"
+Parsea el mensaje de Ping enviado por el servidor Y ENVIA EL PONG 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgPrivmsg (char * m_in)"
+Parsea el mensaje de PRIVMSG 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgQuit (char * m_in)"
+Parsea el mensaje de Quit 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgrplAway (char * m_in)"
+Parsea el mensaje de Away despues de mandar un privmsg 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgTopicChanged (char * m_in)"
+Parsea el mensaje de Ping enviado por el servidor Y ENVIA EL PONG 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWelcome (char * m_in)"
+Parsea el mensaje de WELCOME 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWho (char * m_in)"
+Parsea el mensaje de WHO 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWhoisChannels (char * m_in)"
+Parsea el mensaje de WHOISCHANNELS 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWhoisEnd (char * m_in)"
+Parsea el mensaje de WHOISEND 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWhoisIdle (char * m_in)"
+Parsea el mensaje de WHOISIDLE 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWhoisMode (char * m_in)"
+Parsea el mensaje de WHOISIDLE 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWhoisServer (char * m_in)"
+Parsea el mensaje de WHOISSERVER 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgWhoisUser (char * m_in)"
+Parsea el mensaje de WHOISUSER 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int msgYourHost (char * m_in)"
+Parsea el mensaje de YOURHOST 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIm_in\fP mensaje que se va a parsear 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Servidor y cliente IRC from the source code\&.

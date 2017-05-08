@@ -1,0 +1,104 @@
+.TH "/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P2-audio.h" 3 "Mon May 8 2017" "Servidor y cliente IRC" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P2-audio.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'G\-2301\-04\-P2\-messages\&.h'\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBaudioArgs\fP"
+.br
+.RI "\fIEstructura con los parametros necesarios para las distintas funciones de audio\&. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBaudioChat\fP (char *sender, char *msg)"
+.br
+.RI "\fIGestiona el envio y recibo de archivos de audio\&. \fP"
+.ti -1c
+.RI "void * \fBaudioSend\fP (void *args)"
+.br
+.RI "\fIGestiona el envio de ficheros de audio\&. \fP"
+.ti -1c
+.RI "void * \fBaudioRecv\fP (void *args)"
+.br
+.RI "\fIGestiona el recibo de ficheros de audio\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Modulo de audio\&. Contiene funciones de alto nivel para el envio de audio desde la interfaz de usuario\&. 
+.PP
+\fBAuthor:\fP
+.RS 4
+Antonio Amor Mourelle <antonio.amor@estudiante.uam.es> 
+.PP
+Esther Lopez Ramos <esther.lopezramos@estudiante.uam.es> 
+.PP
+Mario Santiago Yepes <mario.santiagoy@estudiante.uam.es> 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int audioChat (char * sender, char * msg)"
+
+.PP
+Gestiona el envio y recibo de archivos de audio\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsender\fP nick del cliente que envia audio 
+.br
+\fImsg\fP comando que contiene la informacion necesaria para gestionar el envio 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de error, identificador de fichero del socket del cliente 
+.RE
+.PP
+
+.SS "void* audioRecv (void * args)"
+
+.PP
+Gestiona el recibo de ficheros de audio\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIargs\fP estructura que contiene informacion sobre el recibo 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de error, identificador de fichero del socket del cliente 
+.RE
+.PP
+
+.SS "void* audioSend (void * args)"
+
+.PP
+Gestiona el envio de ficheros de audio\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIargs\fP estructura que contiene informacion sobre el envio 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de error, identificador de fichero del socket del cliente 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Servidor y cliente IRC from the source code\&.

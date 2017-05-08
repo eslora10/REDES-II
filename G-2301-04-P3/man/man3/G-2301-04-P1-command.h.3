@@ -1,0 +1,641 @@
+.TH "/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P1-command.h" 3 "Mon May 8 2017" "Servidor y cliente IRC" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P1-command.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+\fC#include <redes2/irc\&.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fB_\fP"
+.br
+.in -1c
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_GNU_SOURCE\fP"
+.br
+.RI "\fIDefine necesario para evitar implicit declaration en asprintf\&. \fP"
+.ti -1c
+.RI "#define \fBMY_ADDR\fP   '127\&.0\&.0\&.1'"
+.br
+.RI "\fIDireccion IP del servidor\&. \fP"
+.ti -1c
+.RI "#define \fBEND_CONNECTION\fP   27"
+.br
+.RI "\fICodigo para indicar al hilo que el usuario va a cerrar la conexion\&. \fP"
+.ti -1c
+.RI "#define \fBMAX_NICK\fP   9"
+.br
+.RI "\fILTamanno maximo que puede tener el nick del usuario segun el estandar IRC\&. \fP"
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef int(* \fBpFuncs\fP) (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIDefinimos el tipo funcion comando\&. \fP"
+.ti -1c
+.RI "typedef struct \fB_\fP \fBSck_SSL\fP"
+.br
+.RI "\fIEstructura argumento de la funcion attendClient\&. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBping\fP ()"
+.br
+.RI "\fIEnvia PING a todos los usuarios, parte del protocolo ping-pong\&. \fP"
+.ti -1c
+.RI "int \fBpongCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando PONG\&. \fP"
+.ti -1c
+.RI "int \fBcheckConnection\fP ()"
+.br
+.RI "\fIFuncion que comprueba que los usuarios han realizado el pong para el protocolo pingpong\&. En caso de que no, se les cierra el socket\&. \fP"
+.ti -1c
+.RI "void * \fBpingpong\fP ()"
+.br
+.RI "\fIFuncion que ejecuta el hilo de pingpong\&. \fP"
+.ti -1c
+.RI "void * \fBattendClientSocket\fP (void *sck_ssl)"
+.br
+.RI "\fIDado un socket acepta la peticion de un cliente\&. \fP"
+.ti -1c
+.RI "int \fBsendErrMsg\fP (long errval, int \fBsck\fP, SSL *ssl, char *nick, char *param)"
+.br
+.RI "\fIFuncion de parseo de errores IRC\&. Coge el codigo de error y envia su mensaje correspondiente\&. \fP"
+.ti -1c
+.RI "int \fBFuncDefault\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEsta funcion se utiliza cuando un comando es desconocido por el servidor para notificar al cliente\&. \fP"
+.ti -1c
+.RI "int \fBuserCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando USER\&. \fP"
+.ti -1c
+.RI "int \fBnickCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando NICK\&. \fP"
+.ti -1c
+.RI "int \fBmodeCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando MODE\&. \fP"
+.ti -1c
+.RI "int \fBquitCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando QUIT\&. \fP"
+.ti -1c
+.RI "int \fBjoinCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando JOIN\&. \fP"
+.ti -1c
+.RI "int \fBpartCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando PART\&. \fP"
+.ti -1c
+.RI "int \fBtopicCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando TOPIC\&. \fP"
+.ti -1c
+.RI "int \fBnamesCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando NAMES\&. \fP"
+.ti -1c
+.RI "int \fBlistCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando LIST\&. \fP"
+.ti -1c
+.RI "int \fBkickCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando KICK\&. \fP"
+.ti -1c
+.RI "int \fBprivmsgCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando PRIVMSG\&. \fP"
+.ti -1c
+.RI "int \fBmotdCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando MOTD\&. \fP"
+.ti -1c
+.RI "int \fBwhoCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando WHO\&. \fP"
+.ti -1c
+.RI "int \fBwhoisCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando WHOIS\&. \fP"
+.ti -1c
+.RI "int \fBpingCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando PING\&. \fP"
+.ti -1c
+.RI "int \fBawayCommand\fP (char *command, char *nick, int \fBsck\fP, SSL *ssl)"
+.br
+.RI "\fIEjecuta el comando AWAY\&. \fP"
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBpFuncs\fP \fBCommands\fP [38]"
+.br
+.RI "\fIArray de punteros a las funciones de comandos\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Modulo de comandos\&. Implementa todos los comandos IRC requeridos por el corrector 
+.PP
+\fBAuthor:\fP
+.RS 4
+Antonio Amor Mourelle <antonio.amor@estudiante.uam.es> 
+.PP
+Esther Lopez Ramos <esther.lopezramos@estudiante.uam.es> 
+.PP
+Mario Santiago Yepes <mario.santiagoy@estudiante.uam.es> 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "void* attendClientSocket (void * sck_ssl)"
+
+.PP
+Dado un socket acepta la peticion de un cliente\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsck_ssl\fP descriptor del socket 
+.RE
+.PP
+
+.SS "int awayCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando AWAY\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int checkConnection ()"
+
+.PP
+Funcion que comprueba que los usuarios han realizado el pong para el protocolo pingpong\&. En caso de que no, se les cierra el socket\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+0 si todo ha ido bien, -1 en caso de error 
+.RE
+.PP
+
+.SS "int FuncDefault (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Esta funcion se utiliza cuando un comando es desconocido por el servidor para notificar al cliente\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int joinCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando JOIN\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int kickCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando KICK\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int listCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando LIST\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int modeCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando MODE\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int motdCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando MOTD\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int namesCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando NAMES\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int nickCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando NICK\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int partCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando PART\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int ping ()"
+
+.PP
+Envia PING a todos los usuarios, parte del protocolo ping-pong\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+0 si todo ha ido bien, -1 en caso de error 
+.RE
+.PP
+
+.SS "int pingCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando PING\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "void* pingpong ()"
+
+.PP
+Funcion que ejecuta el hilo de pingpong\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+0 si todo ha ido bien, -1 en caso de error 
+.RE
+.PP
+
+.SS "int pongCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando PONG\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int privmsgCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando PRIVMSG\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int quitCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando QUIT\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, END_CONNECTION si todo el usuario es eliminado correctamente 
+.RE
+.PP
+
+.SS "int sendErrMsg (long errval, int sck, SSL * ssl, char * nick, char * param)"
+
+.PP
+Funcion de parseo de errores IRC\&. Coge el codigo de error y envia su mensaje correspondiente\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIerrval\fP Codigo de error IRC 
+.br
+\fIsck\fP descriptor de fichero del socket en el que se envia el error 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.br
+\fInick\fP nickname del usuario 
+.br
+\fIparam\fP parametros adicionales para el mensaje de error 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 OK, -1 ERR 
+.RE
+.PP
+
+.SS "int topicCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando TOPIC\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int userCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando USER\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int whoCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando WHO\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SS "int whoisCommand (char * command, char * nick, int sck, SSL * ssl)"
+
+.PP
+Ejecuta el comando WHOIS\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP comando que se va a parsear y ejecutar 
+.br
+\fInick\fP nickname del usuario que ejecuta el comando 
+.br
+\fIsck\fP socket en el que se recibio el comando 
+.br
+\fIssl\fP estructura para la conexion segura de un determinado cliente Si no se está usando ssl debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de fallo, 0 OK 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Servidor y cliente IRC from the source code\&.

@@ -1,0 +1,227 @@
+.TH "/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P3-ssl.h" 3 "Mon May 8 2017" "Servidor y cliente IRC" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P3-ssl.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <openssl/err\&.h>\fP
+.br
+\fC#include <openssl/ssl\&.h>\fP
+.br
+\fC#include 'G\-2301\-04\-P1\-socket\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "SSL_CTX * \fBinicializar_nivel_SSL\fP (char *ca_cert, char *clserv_pem)"
+.br
+.RI "\fIRealiza todas las llamadas necesarias para que la apli- cación pueda usar la capa segura SSL\&. \fP"
+.ti -1c
+.RI "SSL_CTX * \fBfijar_contexto_SSL\fP (char *ca_cert, char *clserv_cert)"
+.br
+.RI "\fIInicializa el contexto que será utilizado para la creación de canales seguros mediante SSL\&. \fP"
+.ti -1c
+.RI "SSL * \fBconectar_canal_seguro_SSL\fP (SSL_CTX *ctx, int \fBsck\fP)"
+.br
+.RI "\fIDado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando el proceso de handshake con el otro extremo\&. \fP"
+.ti -1c
+.RI "SSL * \fBaceptar_canal_seguro_SSL\fP (SSL_CTX *ctx, int \fBsck\fP)"
+.br
+.RI "\fIDado un contexto SSL y un descriptor de socket esta función se queda esperando hasta recibir un handshake por parte del cliente\&. \fP"
+.ti -1c
+.RI "int \fBevaluar_post_connectar_SSL\fP (const SSL *ssl)"
+.br
+.RI "\fIcomprobará una vez realizado el handshake que el canal de comunicación se puede considerar seguro \fP"
+.ti -1c
+.RI "int \fBenviar_datos_SSL\fP (SSL *ssl, char *buffer, int nbytes)"
+.br
+.RI "\fIEnvia datos a traves de la conexion ssl preestablecida\&. \fP"
+.ti -1c
+.RI "int \fBrecibir_datos_SSL\fP (SSL *ssl, char *buffer, int nbytes)"
+.br
+.RI "\fIRecibe datos a traves de la conexion ssl preestablecida\&. \fP"
+.ti -1c
+.RI "void \fBcerrar_canal_SSL\fP (SSL *ssl, SSL_CTX *ctx)"
+.br
+.RI "\fILibera los recursos reservados para la capa ssl\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Modulo de ssl\&. Contiene funciones de alto nivel para la gestion de uncliente en modo seguridad ssl\&. 
+.PP
+\fBAuthor:\fP
+.RS 4
+Antonio Amor Mourelle <antonio.amor@estudiante.uam.es> 
+.PP
+Esther Lopez Ramos <esther.lopezramos@estudiante.uam.es> 
+.PP
+Mario Santiago Yepes <mario.santiagoy@estudiante.uam.es> 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "SSL* aceptar_canal_seguro_SSL (SSL_CTX * ctx, int sck)"
+
+.PP
+Dado un contexto SSL y un descriptor de socket esta función se queda esperando hasta recibir un handshake por parte del cliente\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctx\fP contexto de la aplicacion 
+.br
+\fIsck\fP descriptor del socket 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+puntero a una estructura ssl con la conexion creada 
+.PP
+NULL en caso de error 
+.RE
+.PP
+
+.SS "void cerrar_canal_SSL (SSL * ssl, SSL_CTX * ctx)"
+
+.PP
+Libera los recursos reservados para la capa ssl\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIssl\fP puntero a la estructura de conexión ssl 
+.br
+\fIctx\fP contexto creado para la conexion ssl 
+.RE
+.PP
+
+.SS "SSL* conectar_canal_seguro_SSL (SSL_CTX * ctx, int sck)"
+
+.PP
+Dado un contexto SSL y un descriptor de socket obtiene un canal seguro SSL iniciando el proceso de handshake con el otro extremo\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctx\fP contexto de la aplicacion 
+.br
+\fIsck\fP descriptor del socket 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+puntero a una estructura ssl con la conexion creada 
+.PP
+NULL en caso de error 
+.RE
+.PP
+
+.SS "int enviar_datos_SSL (SSL * ssl, char * buffer, int nbytes)"
+
+.PP
+Envia datos a traves de la conexion ssl preestablecida\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIssl\fP puntero a la estructura de conexión ssl 
+.br
+\fIbuffer\fP cadena con los datos enviados 
+.br
+\fInbytes\fP numero de bytes que se envian 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de error 
+.PP
+0 correcto 
+.RE
+.PP
+
+.SS "int evaluar_post_connectar_SSL (const SSL * ssl)"
+
+.PP
+comprobará una vez realizado el handshake que el canal de comunicación se puede considerar seguro 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIssl\fP puntero a la estructura de conexión ssl 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de error 
+.PP
+0 correcto 
+.RE
+.PP
+
+.SS "SSL_CTX* fijar_contexto_SSL (char * ca_cert, char * clserv_cert)"
+
+.PP
+Inicializa el contexto que será utilizado para la creación de canales seguros mediante SSL\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIca_cert\fP nombre del certificado de la CA 
+.br
+\fIclserv_cert\fP ruta del certificado de la CA 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+contexto creado 
+.PP
+NULL en caso de error 
+.RE
+.PP
+
+.SS "SSL_CTX* inicializar_nivel_SSL (char * ca_cert, char * clserv_pem)"
+
+.PP
+Realiza todas las llamadas necesarias para que la apli- cación pueda usar la capa segura SSL\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIca_cert\fP nombre del certificado de la CA 
+.br
+\fIclserv_pem\fP ruta del certificado de la CA 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+contexto creado 
+.PP
+NULL en caso de error 
+.RE
+.PP
+
+.SS "int recibir_datos_SSL (SSL * ssl, char * buffer, int nbytes)"
+
+.PP
+Recibe datos a traves de la conexion ssl preestablecida\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIssl\fP puntero a la estructura de conexión ssl 
+.br
+\fIbuffer\fP cadena con los datos recibidos 
+.br
+\fInbytes\fP numero de bytes máximos que se pueden recibir 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+<=0 en caso de error 
+.PP
+0 correcto 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Servidor y cliente IRC from the source code\&.
