@@ -1,0 +1,344 @@
+.TH "/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P2-userCommands.h" 3 "Mon May 8 2017" "Servidor y cliente IRC" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P2-userCommands.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include '\&.\&./includes/G\-2301\-04\-P2\-messages\&.h'\fP
+.br
+
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef int(* \fBpUCommand\fP) (char *m_in, SSL *ssl)"
+.br
+.RI "\fIDefinimos el tipo funcion de comando de usuario\&. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBuserCommandDefault\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandNames\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandList\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandJoin\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandNick\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandWhois\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandPrivmsg\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandMode\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandKick\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandPart\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandQuit\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandAway\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandBack\fP (char *command, SSL *ssl)"
+.br
+.ti -1c
+.RI "int \fBuserCommandTopic\fP (char *command, SSL *ssl)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBpUCommand\fP \fBUserCommands\fP [64]"
+.br
+.RI "\fIArray de punteros a las funciones de comandos de usuario\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Modulo de comandos de usuario\&. Contiene funciones de alto nivel para la gestion de comandos que ejecuta el cliente\&. 
+.PP
+\fBAuthor:\fP
+.RS 4
+Antonio Amor Mourelle <antonio.amor@estudiante.uam.es> 
+.PP
+Esther Lopez Ramos <esther.lopezramos@estudiante.uam.es> 
+.PP
+Mario Santiago Yepes <mario.santiagoy@estudiante.uam.es> 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int userCommandAway (char * command, SSL * ssl)"
+Parsea el comando de usuario AWAY crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandBack (char * command, SSL * ssl)"
+Parsea el comando de usuario BACK 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandDefault (char * command, SSL * ssl)"
+Accion por defecto para los mensajes 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandJoin (char * command, SSL * ssl)"
+Parsea el comando de usuario JOIN crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandKick (char * command, SSL * ssl)"
+Parsea el comando de usuario KICK crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandList (char * command, SSL * ssl)"
+Parsea el comando de usuario LIST crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandMode (char * command, SSL * ssl)"
+Parsea el comando de usuario MODE crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandNames (char * command, SSL * ssl)"
+Parsea el comando de usuario NAMES crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandNick (char * command, SSL * ssl)"
+Parsea el comando de usuario nick crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandPart (char * command, SSL * ssl)"
+Parsea el comando de usuario PART crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandPrivmsg (char * command, SSL * ssl)"
+Parsea el comando de usuario PRIVMSG crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandQuit (char * command, SSL * ssl)"
+Parsea el comando de usuario QUIT crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandTopic (char * command, SSL * ssl)"
+Parsea el comando de usuario TOPIC 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SS "int userCommandWhois (char * command, SSL * ssl)"
+Parsea el comando de usuario PRIVMSG crea el mensaje para el servidor y lo envia 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcommand\fP commando de usuario que se va a enviar 
+.br
+\fIssl\fP estructura de ssl\&. En caso de no usar la capa segura debe valer NULL 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si OK 
+.PP
+-1 ERROR 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Servidor y cliente IRC from the source code\&.

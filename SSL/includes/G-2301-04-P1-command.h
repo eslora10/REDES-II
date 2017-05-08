@@ -1,6 +1,10 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+/**
+ * @def _GNU_SOURCE
+ * @brief Define necesario para evitar implicit declaration en asprintf
+ */
 #define _GNU_SOURCE
 
 /**
@@ -21,6 +25,7 @@
  * @brief Direccion IP del servidor
  */
 #define MY_ADDR "127.0.0.1"
+
 /**
  * @def END_CONNECTION
  * @brief Codigo para indicar al hilo que el usuario va a cerrar la conexion
@@ -44,17 +49,15 @@ int ping();
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int pongCommand(char* command, char* nick, int sck, SSL *ssl);
 
 /**
- * @brief Inicia la conexion con el cliente. Espera los comandos
- * NICK, USER en este orden, si no se cierra la conexion con el cliente
- * @param cl_sck identificador de fichero con el socket
- * @param pBuffer buffer para la recepcion de mensajes
- * @param nick cadena de caracteres en la que se guardara el nick del
- * nuevo usuario
+ * @brief Funcion que comprueba que los usuarios han realizado el pong para el
+ * protocolo pingpong. En caso de que no, se les cierra el socket
  * @return 0 si todo ha ido bien, -1 en caso de error
  */
 int checkConnection();
@@ -72,13 +75,15 @@ void* pingpong();
 void * attendClientSocket(void *sck_ssl);
 
 /**
-* @brief Funcion de parseo de errores IRC. Coge el codigo de error y envia su
-* mensaje correspondiente
-* @param errval Codigo de error IRC
-* @param sck descriptor de fichero del socket en el que se envia el error
-* @param nick nickname del usuario
-* @param param parametros adicionales para el mensaje de error
-* @return 0 OK, -1 ERR
+ * @brief Funcion de parseo de errores IRC. Coge el codigo de error y envia su
+ * mensaje correspondiente
+ * @param errval Codigo de error IRC
+ * @param sck descriptor de fichero del socket en el que se envia el error
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
+ * @param nick nickname del usuario
+ * @param param parametros adicionales para el mensaje de error
+ * @return 0 OK, -1 ERR
 */
 int sendErrMsg(long errval, int sck, SSL *ssl, char *nick, char *param);
 
@@ -88,6 +93,8 @@ int sendErrMsg(long errval, int sck, SSL *ssl, char *nick, char *param);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int FuncDefault(char* command, char* nick, int sck, SSL *ssl);
@@ -97,6 +104,8 @@ int FuncDefault(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int userCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -106,6 +115,8 @@ int userCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int nickCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -115,6 +126,8 @@ int nickCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int modeCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -124,6 +137,8 @@ int modeCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, END_CONNECTION si todo
  * el usuario es eliminado correctamente
  */
@@ -134,6 +149,8 @@ int quitCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int joinCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -143,6 +160,8 @@ int joinCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int partCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -152,6 +171,8 @@ int partCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int topicCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -162,6 +183,8 @@ int topicCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int namesCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -171,6 +194,8 @@ int namesCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int listCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -180,6 +205,8 @@ int listCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int kickCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -190,6 +217,8 @@ int kickCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int privmsgCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -199,6 +228,8 @@ int privmsgCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int motdCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -208,6 +239,8 @@ int motdCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int whoCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -217,6 +250,8 @@ int whoCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int whoisCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -226,6 +261,8 @@ int whoisCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int pingCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -235,6 +272,8 @@ int pingCommand(char* command, char* nick, int sck, SSL *ssl);
  * @param command comando que se va a parsear y ejecutar
  * @param nick nickname del usuario que ejecuta el comando
  * @param sck socket en el que se recibio el comando
+ * @param ssl estructura para la conexion segura de un determinado cliente
+ * Si no se está usando ssl debe valer NULL
  * @return -1 en caso de fallo, 0 OK
  */
 int awayCommand(char* command, char* nick, int sck, SSL *ssl);
@@ -247,9 +286,19 @@ typedef int (*pFuncs)(char *command, char* nick, int sck, SSL *ssl);
 
 /**
  * @typedef Sck_SSL
- * @brief Estructura argumento de la funcion attendClient que contiene el
- * en caso de que el cliente se conecte en el puerto 6667 el socket y en caso
- * de ser en el 6669 el socket y la estructura ssl ya inicializada
+ * @brief Estructura argumento de la funcion attendClient
+ */
+/**
+ * @struct _
+ * estructura para guardar los argumentos de attendClient
+ */
+/** 
+ * @var _::sck
+ * socket en caso del cliente. Parametro obligtorio
+ */
+/** 
+ * @var _::ssl
+ * Estructura ssl necesaria si se ha iniciado una conexion segura
  */
 typedef struct _{
     int sck;

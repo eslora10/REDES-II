@@ -1,0 +1,244 @@
+.TH "/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P1-socket.h" 3 "Mon May 8 2017" "Servidor y cliente IRC" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/esther/Escritorio/REDES-II/SSL/includes/G-2301-04-P1-socket.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+\fC#include <unistd\&.h>\fP
+.br
+\fC#include <sys/types\&.h>\fP
+.br
+\fC#include <sys/socket\&.h>\fP
+.br
+\fC#include <netinet/in\&.h>\fP
+.br
+\fC#include <errno\&.h>\fP
+.br
+\fC#include <netdb\&.h>\fP
+.br
+\fC#include <redes2/irc\&.h>\fP
+.br
+\fC#include <pthread\&.h>\fP
+.br
+\fC#include <arpa/inet\&.h>\fP
+.br
+\fC#include <signal\&.h>\fP
+.br
+\fC#include <sys/stat\&.h>\fP
+.br
+\fC#include <syslog\&.h>\fP
+.br
+\fC#include <fcntl\&.h>\fP
+.br
+\fC#include 'G\-2301\-04\-P3\-ssl\&.h'\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMAXLEN\fP   512"
+.br
+.RI "\fILongitud maxima de un comando IRC\&. \fP"
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBprotocol\fP { \fBTCP\fP, \fBUDP\fP }
+.RI "\fIEnumeracion con los protocolos de nivel de transporte que es capaz de soportar nuesta aplicaión\&. \fP""
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBdaemonizar\fP ()"
+.br
+.RI "\fIDaemoniza el proceso\&. \fP"
+.ti -1c
+.RI "int \fBopenSocket\fP (\fBprotocol\fP p)"
+.br
+.RI "\fIAbre un socket para comunicarse con el servidor\&. \fP"
+.ti -1c
+.RI "int \fBbindSocket\fP (int \fBsck\fP, uint16_t port, int max_clients, \fBprotocol\fP p)"
+.br
+.RI "\fIDado un socket notifica al SO de la apertura del mismo\&. \fP"
+.ti -1c
+.RI "int \fBacceptSocket\fP (int \fBsck\fP)"
+.br
+.RI "\fIAcepta conexiones de clientes\&. \fP"
+.ti -1c
+.RI "int \fBconnectClientSocket\fP (int \fBsck\fP, char *host_name, int port)"
+.br
+.RI "\fIDado un socket, conecta con una IP y un puerto especifico\&. Específica para clientes\&. \fP"
+.ti -1c
+.RI "int \fBsendData\fP (int \fBsck\fP, SSL *ssl, \fBprotocol\fP p, char *dest_addrUDP, int portUDP, char *data, int len)"
+.br
+.RI "\fIDado un socket o una estructura ssl envia datos al otro extremo de la conexion\&. \fP"
+.ti -1c
+.RI "int \fBreceiveData\fP (int \fBsck\fP, SSL *ssl, \fBprotocol\fP p, char *dest_addrUDP, int portUDP, char *data, int len)"
+.br
+.RI "\fIDado un socket o una estructura ssl recibe datos al otro extremo de la conexion\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Modulo de sockets\&. Contiene funciones de alto nivel para el manejo de sockets así como la función que manejan los hilos\&. 
+.PP
+\fBAuthor:\fP
+.RS 4
+Antonio Amor Mourelle <antonio.amor@estudiante.uam.es> 
+.PP
+Esther Lopez Ramos <esther.lopezramos@estudiante.uam.es> 
+.PP
+Mario Santiago Yepes <mario.santiagoy@estudiante.uam.es> 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int acceptSocket (int sck)"
+
+.PP
+Acepta conexiones de clientes\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsck\fP identificador de fichero del socket 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+-1 en caso de error, identificador de fichero del socket del cliente 
+.RE
+.PP
+
+.SS "int bindSocket (int sck, uint16_t port, int max_clients, \fBprotocol\fP p)"
+
+.PP
+Dado un socket notifica al SO de la apertura del mismo\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsck\fP descriptor del socket 
+.br
+\fIport\fP puerto con el protocolo de nivel de aplicacion 
+.br
+\fImax_clients\fP numero maximo de clientes esperando a ser atendidos 
+.br
+\fIp\fP protocolo de nivel de aplicaion TCP o UDP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si se realiza todo correctamente, -1 en caso de error 
+.RE
+.PP
+
+.SS "int connectClientSocket (int sck, char * host_name, int port)"
+
+.PP
+Dado un socket, conecta con una IP y un puerto especifico\&. Específica para clientes\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsck\fP identificador de fichero con el socket 
+.br
+\fIhost_name\fP url o direccion IP del servidor 
+.br
+\fIport\fP numero de puerto 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 si todo ha ido bien, -1 en caso de error 
+.RE
+.PP
+
+.SS "int openSocket (\fBprotocol\fP p)"
+
+.PP
+Abre un socket para comunicarse con el servidor\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIp\fP UDP en caso de querer conexion no fiable TCP conexion segura (valor por defecto) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+devuelve el descriptor de fichero del socket, -1 en caso de error 
+.RE
+.PP
+
+.SS "int receiveData (int sck, SSL * ssl, \fBprotocol\fP p, char * dest_addrUDP, int portUDP, char * data, int len)"
+
+.PP
+Dado un socket o una estructura ssl recibe datos al otro extremo de la conexion\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsck\fP identificador de fichero con el socket 
+.br
+\fIssl\fP puntero a una estructura ssl\&. Si vale NULL se asume canal no seguro 
+.br
+\fIp\fP protocolo TCP o UDP (se asume TCP por defecto) 
+.br
+\fIdest_addrUDP\fP nombre del host al que vamos a enviar en UDP 
+.br
+\fIportUDP\fP puerto al que enviamos los datos en UDP, debe coincidir con el del socket 
+.br
+\fIdata\fP datos que se envian 
+.br
+\fIlen\fP de los datos que se envian 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+numero de bytes leidos si todo correcto 
+.PP
+-1 en caso de error 
+.RE
+.PP
+
+.SS "int sendData (int sck, SSL * ssl, \fBprotocol\fP p, char * dest_addrUDP, int portUDP, char * data, int len)"
+
+.PP
+Dado un socket o una estructura ssl envia datos al otro extremo de la conexion\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsck\fP identificador de fichero con el socket 
+.br
+\fIssl\fP puntero a una estructura ssl\&. Si vale NULL se asume canal no seguro 
+.br
+\fIp\fP protocolo TCP o UDP (se asume TCP por defecto) 
+.br
+\fIdest_addrUDP\fP nombre del host al que vamos a enviar en UDP 
+.br
+\fIportUDP\fP puerto al que enviamos los datos en UDP, debe coincidir con el del socket 
+.br
+\fIdata\fP datos que se envian 
+.br
+\fIlen\fP de los datos que se envian 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+numero de bytes leidos si todo correcto 
+.PP
+-1 en caso de error 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Servidor y cliente IRC from the source code\&.

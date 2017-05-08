@@ -39,6 +39,10 @@
  */
 #define MAXLEN 512 
 
+/** @enum protocol
+ *  @brief Enumeracion con los protocolos de nivel
+ *  de transporte que es capaz de soportar nuesta aplicaión
+ */
 typedef enum {
     TCP, UDP
 } protocol;
@@ -50,7 +54,7 @@ void daemonizar();
 
 /**
  * @brief Abre un socket para comunicarse con el servidor
- * @param protocol UDP en caso de querer conexion no fiable
+ * @param p UDP en caso de querer conexion no fiable
  * TCP conexion segura (valor por defecto)
  * @return devuelve el descriptor de fichero del socket,
                   -1 en caso de error
@@ -62,6 +66,7 @@ int openSocket(protocol p);
  * @param sck descriptor del socket
  * @param port puerto con el protocolo de nivel de aplicacion
  * @param max_clients numero maximo de clientes esperando a ser atendidos
+ * @param p protocolo de nivel de aplicaion TCP o UDP
  * @return 0 si se realiza todo correctamente,
                   -1 en caso de error
  */
@@ -93,7 +98,7 @@ int connectClientSocket(int sck, char* host_name, int port);
  * @param dest_addrUDP nombre del host al que vamos a enviar en UDP
  * @param portUDP puerto al que enviamos los datos en UDP, debe coincidir con el del socket
  * @param data datos que se envian
- * @param longitud de los datos que se envian
+ * @param len de los datos que se envian
  * @return numero de bytes leidos si todo correcto
  * @return -1 en caso de error
  */
@@ -109,7 +114,7 @@ int sendData(int sck, SSL *ssl, protocol p, char *dest_addrUDP, int portUDP, cha
  * @param dest_addrUDP nombre del host al que vamos a enviar en UDP
  * @param portUDP puerto al que enviamos los datos en UDP, debe coincidir con el del socket
  * @param data datos que se envian
- * @param longitud de los datos que se envian
+ * @param len de los datos que se envian
  * @return numero de bytes leidos si todo correcto
  * @return -1 en caso de error
  */

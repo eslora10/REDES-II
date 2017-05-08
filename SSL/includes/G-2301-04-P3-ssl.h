@@ -18,8 +18,8 @@
 /**
  * @brief Realiza todas las llamadas necesarias para que la apli-
  * cación pueda usar la capa segura SSL.
- * @param cert_file nombre del certificado de la CA
- * @param cert_path ruta del certificado de la CA
+ * @param ca_cert nombre del certificado de la CA
+ * @param clserv_pem ruta del certificado de la CA
  * @return contexto creado
  * @return NULL en caso de error
 */
@@ -27,8 +27,8 @@ SSL_CTX* inicializar_nivel_SSL(char *ca_cert, char *clserv_pem);
 
 /**
  * @brief Inicializa el contexto que será utilizado para la creación de canales seguros mediante SSL
- * @param cert_file nombre del certificado de la CA
- * @param cert_path ruta del certificado de la CA
+ * @param ca_cert nombre del certificado de la CA
+ * @param clserv_cert ruta del certificado de la CA
  * @return contexto creado
  * @return NULL en caso de error
 */
@@ -67,6 +67,8 @@ int evaluar_post_connectar_SSL(const SSL* ssl);
 /**
  * @brief Envia datos a traves de la conexion ssl preestablecida
  * @param ssl puntero a la estructura de conexión ssl
+ * @param buffer cadena con los datos enviados
+ * @param nbytes numero de bytes que se envian
  * @return -1 en caso de error
  * @return 0 correcto
  */
@@ -76,6 +78,8 @@ int enviar_datos_SSL(SSL* ssl, char* buffer, int nbytes);
 /**
  * @brief Recibe datos a traves de la conexion ssl preestablecida
  * @param ssl puntero a la estructura de conexión ssl
+ * @param buffer cadena con los datos recibidos
+ * @param nbytes numero de bytes máximos que se pueden recibir
  * @return <=0 en caso de error
  * @return 0 correcto
  */

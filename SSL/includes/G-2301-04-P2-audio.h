@@ -34,9 +34,21 @@ void *audioSend(void *args);
  */
 void *audioRecv(void *args);
 
+/**
+ * @struct audioArgs
+ * @brief Estructura con los parametros necesarios para las distintas funciones de audio
+ */
+/** 
+ * @var audioArgs::ip
+ * Direccion IP del que envía o recibe el audio
+ */
+/** 
+ * @var audioArgs::port
+ * Puerto en el que se establece la comunicación
+ */
 struct audioArgs{
     char *ip;
-    int port;
+    int port; 
 };
 
 

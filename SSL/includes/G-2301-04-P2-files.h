@@ -10,17 +10,48 @@
  * @file G-2301-04-P2-files.h
  */
 
+/**
+ * @struct fileReceiver_args
+ * @brief Estructura argumento de la funcion fileReceiver, con los parámetros necesarios para esta
+ */
+/** 
+ * @var fileReceiver_args::sckF
+ * Socket en el que previamente se ha abierto la conexion con el otro extremo
+ */
+/** 
+ * @var fileReceiver_args::path
+ * Ruta en la que se va a guardar el fichero
+ */
+/** 
+ * @var fileReceiver_args::length
+ * Longitud del fichero
+ */
 struct fileReceiver_args {
     int sckF;
     char *path;
     long unsigned int length;
 };
 
-
+/**
+ * @struct fileSender_args
+ * @brief Estructura argumento de la funcion fileSender, con los parámetros necesarios para esta
+ */
+/** 
+ * @var fileSender_args::data
+ * Datos del fichero
+ */
+/** 
+ * @var fileSender_args::length
+ * Longitud del fichero
+ */
+/** 
+ * @var fileSender_args::sck
+ * Socket en el que se espera al receptor del fichero
+ */
 struct fileSender_args {
     char *data;
     long unsigned int length;
-    int sck;
+    int sck; 
 };
 
 /**
@@ -44,4 +75,5 @@ int fileDialog(char *nick, char *msg);
  * @return -1 en caso de error, identificador de fichero del socket del cliente
  */
 void* fileSender(void *fs);
+
 #endif /*FILES_H*/

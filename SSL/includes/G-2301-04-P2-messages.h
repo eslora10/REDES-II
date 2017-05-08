@@ -14,14 +14,35 @@
 #include <redes2/ircxchat.h>
 #include "G-2301-04-P1-socket.h"
 
+/**
+ * @def MAX_TCP
+ * @brief Longitud máxima en bytes de un paquete TCP
+ */
 #define MAX_TCP 65535
 
-
+/**
+ * @var ssl_channel
+ * @brief Variable con la estructura ssl del cliente IRC
+ */
 SSL* ssl_channel;
 
-int sck; /*Socket en el que se conecta el cliente*/
-char hostName[MAXLEN]; /*Nombre de host que nos asigna el servidor al entrar en el.
-                 * Usado para el envío de ficheros*/
+/**
+ * @var sck
+ * @brief Variable con el descriptor de fichero del socket del cliente IRC
+ */
+int sck; 
+
+/**
+ * @var hostName
+ * @brief Nombre de host que nos asigna el servidor al entrar en el.
+ * Usado para el envío de ficheros
+ */
+char hostName[MAXLEN];
+
+/**
+ * @var stopAudio
+ * @brief Variable que le indica al hilo emisor o receptor de audio que debe parar de enviar
+ */
 int stopAudio;
 
 /**
@@ -313,14 +334,14 @@ int msgBack(char *m_in);
 int msgrplAway(char *m_in);
 
 /**
- * @typedef pFuncs
- * @brief Definimos el tipo funcion comando
+ * @typedef pMsg
+ * @brief Definimos el tipo funcion mensaje
  */
 typedef int (*pMsg)(char *m_in);
 
 /**
- * @var Commands
- * @brief Array de punteros a las funciones de comandos
+ * @var Messages
+ * @brief Array de punteros a las funciones de mensajes del servidor
  */
 pMsg Messages[2048];
 
